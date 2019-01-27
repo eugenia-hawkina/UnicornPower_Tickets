@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import telran.ashkelon2018.ticket.enums.AccessType;
 
 @Getter
 @Setter
@@ -21,4 +22,6 @@ public class SeatId implements Serializable{
 	String block;
 	String row;
 	String seatNumber;
+	AccessType accessType;
+	
 }

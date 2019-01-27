@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.Singular;
+import telran.ashkelon2018.ticket.domain.EventId;
 import telran.ashkelon2018.ticket.domain.Seat;
 import telran.ashkelon2018.ticket.enums.EventStatus;
 import telran.ashkelon2018.ticket.enums.EventType;
@@ -18,11 +19,12 @@ import telran.ashkelon2018.ticket.enums.EventType;
 @NoArgsConstructor
 @Builder
 public class UpdateEventDto {
+	EventId eventId;
 	EventStatus eventStatus;
 	String eventName;
 	String artist;
 	Integer eventDurationMinutes;	
-	@Singular Set<Seat> seats;
+	Set<SeatDto> seatDto;
 	EventType eventType; 
 	String description;
 	Set<String> images;

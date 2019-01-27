@@ -17,17 +17,17 @@ import telran.ashkelon2018.ticket.enums.AccessType;
 @ToString
 @EqualsAndHashCode(of="seatId")
 public class Seat {
-	@Id SeatId seatId;
-	AccessType accessType;
+	@Id 
+	SeatId seatId;
 	PriceRange priceRange;
 	boolean availability;
 	boolean paid;
 	long bookingTime;
 	
 	
-	public Seat(SeatId seatId, AccessType accessType, boolean availability, boolean paid) {
+	public Seat(SeatId seatId, PriceRange priceRange, boolean availability, boolean paid) {
 		this.seatId = seatId;
-		this.accessType = accessType;
+		this.priceRange = priceRange;
 		this.availability = true;
 		this.paid = false;
 	} 

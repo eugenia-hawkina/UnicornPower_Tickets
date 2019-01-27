@@ -17,7 +17,6 @@ import telran.ashkelon2018.ticket.enums.EventType;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
 @ToString
 @EqualsAndHashCode(of = { "eventId" })
 @Document(collection="ticketService_UpcomingEvents")
@@ -26,11 +25,31 @@ public class Event {
 	String eventName;
 	String artist;
 	// @EmbeddedId - for sql
-	@Id EventId eventId;
+	@Id 
+	EventId eventId;
 	Integer eventDurationMinutes;	
 	Set<Seat> seats;
 	EventType eventType; 
 	String description;
 	Set<String> images;
 	String cancellationReason;
+	String userId;
+	
+	
+	public Event(EventStatus eventStatus, String eventName, String artist, EventId eventId,
+			Integer eventDurationMinutes, Set<Seat> seats, EventType eventType, String description, Set<String> images,
+			String userId) {
+		this.eventStatus = eventStatus;
+		this.eventName = eventName;
+		this.artist = artist;
+		this.eventId = eventId;
+		this.eventDurationMinutes = eventDurationMinutes;
+		this.seats = seats;
+		this.eventType = eventType;
+		this.description = description;
+		this.images = images;
+		this.userId = userId;
+	}
+	
+	
 }

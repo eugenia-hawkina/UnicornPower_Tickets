@@ -19,7 +19,8 @@ import telran.ashkelon2018.ticket.enums.HallType;
 @EqualsAndHashCode(of = "hallId")
 @Document(collection="ticketService_halls")
 public class Hall {
-	@Id String hallId;
+	@Id 
+	String hallId;
 	String locationName;
 	String hallName;
 	String country;

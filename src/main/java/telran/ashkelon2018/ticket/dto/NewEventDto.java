@@ -11,7 +11,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.Singular;
-import telran.ashkelon2018.ticket.domain.Seat;
+import telran.ashkelon2018.ticket.domain.EventId;
 import telran.ashkelon2018.ticket.enums.EventType;
 
 @Getter
@@ -23,10 +23,9 @@ public class NewEventDto {
 //	EventStatus eventStatus; 
 	String eventName;
 	String artist;	
-	@JsonFormat(pattern = "yyyy-MM-dd 'T' HH:mm") LocalDateTime eventStart; 
 	Integer eventDurationMinutes;	
-	String hallId;
-	@Singular Set<SeatDto> seats;
+	EventId eventId;
+	Set<SeatDto> seatDto;
 	EventType eventType; 
 	String description;
 	Set<String> images;

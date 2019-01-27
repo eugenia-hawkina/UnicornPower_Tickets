@@ -12,11 +12,11 @@ public interface TicketService {
 	
 	Event addEvent(NewEventDto newEventDto);
 	
-	Event updateEvent(EventId eventId, UpdateEventDto updateEventDto);
+	Event updateEvent(UpdateEventDto updateEventDto);
 	
 	Event receiveEventInfo(EventId eventId);
 
-	Set<Event> receiveManagerUpcomingEvents();	// managerId from token
+	Set<Event> receiveUserUpcomingEvents();	// managerId from token
 	
 	Set<Event> receiveEventList(EventListByDateDto filter);
 	

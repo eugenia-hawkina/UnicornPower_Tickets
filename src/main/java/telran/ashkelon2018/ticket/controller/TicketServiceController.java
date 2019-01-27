@@ -32,20 +32,20 @@ public class TicketServiceController {
 		return ticketService.addEvent(newEventDto);
 	}
 	
-	@PutMapping("/event/{eventId}")
-	public Event updateEvent(@PathVariable EventId eventId, @RequestBody UpdateEventDto updateEventDto) {
-		return ticketService.updateEvent(eventId, updateEventDto);
+	@PutMapping("/event")
+	public Event updateEvent(@RequestBody UpdateEventDto updateEventDto) {
+		return ticketService.updateEvent(updateEventDto);
 	}
 	
-	@GetMapping("/event/{eventId}")
-	public Event receiveEventInfo(@PathVariable EventId eventId) {
+	@PutMapping("/event/info")
+	public Event receiveEventInfo(@RequestBody EventId eventId) {
 		return ticketService.receiveEventInfo(eventId);
 	}
 
-	// FIXME // managerId from token
-	@GetMapping("/{managerId}/events")
-	public Set<Event> receiveManagerUpcomingEvents(){
-		return ticketService.receiveManagerUpcomingEvents();
+	// FIXME // userId from token
+	@GetMapping("/{userId}/events")
+	public Set<Event> receiveUserUpcomingEvents(){
+		return ticketService.receiveUserUpcomingEvents();
 	}	
 	
 	@GetMapping("/events/search")

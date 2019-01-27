@@ -5,15 +5,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import telran.ashkelon2018.ticket.domain.PriceRange;
+import telran.ashkelon2018.ticket.domain.SeatId;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class SeatDto {
-	String block;
-	String row;
-	String seatNumber;
+	SeatId seatId;
 	PriceRange priceRange;
 
 }
