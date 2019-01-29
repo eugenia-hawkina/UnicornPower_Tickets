@@ -3,9 +3,7 @@ package telran.ashkelon2018.ticket.controller;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -15,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import telran.ashkelon2018.ticket.domain.Event;
 import telran.ashkelon2018.ticket.domain.EventId;
+import telran.ashkelon2018.ticket.dto.EventCancellationDto;
 import telran.ashkelon2018.ticket.dto.EventListByDateDto;
 import telran.ashkelon2018.ticket.dto.NewEventDto;
 import telran.ashkelon2018.ticket.dto.UpdateEventDto;
@@ -22,7 +21,7 @@ import telran.ashkelon2018.ticket.service.TicketService;
 
 @RestController
 @RequestMapping("/manager")
-public class TicketServiceController {
+public class TicketServiceManagerController {
 	
 	@Autowired
 	TicketService ticketService;
@@ -48,13 +47,13 @@ public class TicketServiceController {
 		return ticketService.receiveUserUpcomingEvents();
 	}	
 	
-	@GetMapping("/events/search")
+	@PostMapping("/events/search")
 	public Set<Event> receiveEventList(@RequestBody EventListByDateDto filter, @RequestParam int page, @RequestParam int size){
-		return ticketService.receiveEventList(filter);
+		return ticketService.receiveEventList(filter, page, size);
 	}
 	
-	@DeleteMapping("/event/{eventId}")
-	public Event cancelEvent(@PathVariable EventId eventId, @RequestBody String reason) {
-		return ticketService.cancelEvent(eventId, reason);
+	@PutMapping("/event/cancellation")
+	public Event cancelEvent(@RequestBody EventCancellationDto eventCancellation) {
+		return ticketService.cancelEvent(eventCancellation);
 	}
 }

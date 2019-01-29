@@ -9,6 +9,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.Singular;
 import lombok.ToString;
 import telran.ashkelon2018.ticket.enums.HallType;
 
@@ -30,6 +31,7 @@ public class Hall {
 	String builing;
 	HallType hallType;
 	Integer capacity;
+	@Singular
 	Set<String> managers;	// manager's id
 	Set<Seat> seats;
 	
@@ -49,7 +51,13 @@ public class Hall {
 		this.seats = seats;
 	}
 	
+	public void addManager(String manager) {
+		managers.add(manager);
+	}
 	
+	public void removeManager(String manager) {
+		managers.remove(manager);
+	}
 }
 
 

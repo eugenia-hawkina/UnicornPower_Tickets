@@ -7,9 +7,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.Singular;
 import telran.ashkelon2018.ticket.domain.EventId;
-import telran.ashkelon2018.ticket.domain.Seat;
 import telran.ashkelon2018.ticket.enums.EventStatus;
 import telran.ashkelon2018.ticket.enums.EventType;
 

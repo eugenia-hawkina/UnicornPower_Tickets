@@ -17,6 +17,7 @@ import telran.ashkelon2018.ticket.enums.EventType;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 @ToString
 @EqualsAndHashCode(of = { "eventId" })
 @Document(collection="ticketService_UpcomingEvents")
@@ -36,10 +37,10 @@ public class Event {
 	String userId;
 	
 	
-	public Event(EventStatus eventStatus, String eventName, String artist, EventId eventId,
+	public Event(String eventName, String artist, EventId eventId,
 			Integer eventDurationMinutes, Set<Seat> seats, EventType eventType, String description, Set<String> images,
 			String userId) {
-		this.eventStatus = eventStatus;
+		this.eventStatus = EventStatus.HIDDEN;
 		this.eventName = eventName;
 		this.artist = artist;
 		this.eventId = eventId;
@@ -48,7 +49,34 @@ public class Event {
 		this.eventType = eventType;
 		this.description = description;
 		this.images = images;
-		this.userId = userId;
+	}
+
+	public Event(EventArchived eventArchived) {
+		this.eventStatus = eventArchived.getEventStatus();
+		this.eventName = eventArchived.getEventName();
+		this.artist = eventArchived.getArtist();
+		this.eventId = eventArchived.getEventId();
+		this.eventDurationMinutes = eventArchived.getEventDurationMinutes();
+		this.seats = eventArchived.getSeats();
+		this.eventType = eventArchived.getEventType();
+		this.description = eventArchived.getDescription();
+		this.images = eventArchived.getImages();
+		this.cancellationReason = eventArchived.getCancellationReason();
+		this.userId = eventArchived.getUserId();
+	}
+	
+	public Event(EventCancelled eventCancelled) {
+		this.eventStatus = eventCancelled.getEventStatus();
+		this.eventName = eventCancelled.getEventName();
+		this.artist = eventCancelled.getArtist();
+		this.eventId = eventCancelled.getEventId();
+		this.eventDurationMinutes = eventCancelled.getEventDurationMinutes();
+		this.seats = eventCancelled.getSeats();
+		this.eventType = eventCancelled.getEventType();
+		this.description = eventCancelled.getDescription();
+		this.images = eventCancelled.getImages();
+		this.cancellationReason = eventCancelled.getCancellationReason();
+		this.userId = eventCancelled.getUserId();
 	}
 	
 	
