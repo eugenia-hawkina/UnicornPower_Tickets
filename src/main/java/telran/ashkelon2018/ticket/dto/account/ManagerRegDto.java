@@ -1,5 +1,7 @@
 package telran.ashkelon2018.ticket.dto.account;
 
+import javax.validation.constraints.NotNull;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -12,6 +14,8 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 public class ManagerRegDto {
+	@NotNull
 	String name;
+	@NotNull
 	String phone;
 }
