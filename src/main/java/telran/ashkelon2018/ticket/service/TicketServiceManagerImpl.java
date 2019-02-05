@@ -27,7 +27,7 @@ import telran.ashkelon2018.ticket.exceptions.EventExistsException;
 import telran.ashkelon2018.ticket.exceptions.NotFoundException;
 
 @Service
-public class TicketServiceImpl implements TicketService {
+public class TicketServiceManagerImpl implements TicketServiceManager {
 	@Autowired
 	EventRepository eventRepository;
 	

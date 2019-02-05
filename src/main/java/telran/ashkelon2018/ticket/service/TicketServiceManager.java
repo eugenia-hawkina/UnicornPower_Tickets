@@ -9,7 +9,7 @@ import telran.ashkelon2018.ticket.dto.EventListByDateDto;
 import telran.ashkelon2018.ticket.dto.NewEventDto;
 import telran.ashkelon2018.ticket.dto.UpdateEventDto;
 
-public interface TicketService {
+public interface TicketServiceManager {
 	
 	Event addEvent(NewEventDto newEventDto);
 	

@@ -17,14 +17,14 @@ import telran.ashkelon2018.ticket.dto.EventCancellationDto;
 import telran.ashkelon2018.ticket.dto.EventListByDateDto;
 import telran.ashkelon2018.ticket.dto.NewEventDto;
 import telran.ashkelon2018.ticket.dto.UpdateEventDto;
-import telran.ashkelon2018.ticket.service.TicketService;
+import telran.ashkelon2018.ticket.service.TicketServiceManager;
 
 @RestController
 @RequestMapping("/manager")
 public class TicketServiceManagerController {
 	
 	@Autowired
-	TicketService ticketService;
+	TicketServiceManager ticketService;
 
 	@PostMapping("/event")
 	public Event addEvent(@RequestBody NewEventDto newEventDto) {

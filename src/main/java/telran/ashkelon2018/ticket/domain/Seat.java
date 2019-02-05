@@ -19,9 +19,10 @@ public class Seat {
 	@Id 
 	SeatId seatId;
 	PriceRange priceRange;
-	boolean availability;
-	boolean paid;
+	boolean availability;	// for booking
 	long bookingTime;
+	boolean paid;
+	BuyerInfo buyerInfo;
 	
 	
 	public Seat(SeatId seatId, PriceRange priceRange, boolean availability, boolean paid) {
