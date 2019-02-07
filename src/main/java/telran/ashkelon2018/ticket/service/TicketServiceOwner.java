@@ -2,26 +2,27 @@ package telran.ashkelon2018.ticket.service;
 
 import java.util.Set;
 
-import org.springframework.security.core.userdetails.User;
-
 import telran.ashkelon2018.ticket.domain.Event;
 import telran.ashkelon2018.ticket.domain.EventId;
 import telran.ashkelon2018.ticket.domain.Seat;
 import telran.ashkelon2018.ticket.domain.SeatId;
+import telran.ashkelon2018.ticket.dto.EventApprovedDto;
+import telran.ashkelon2018.ticket.dto.account.AccountProfileDtoForOwner;
+import telran.ashkelon2018.ticket.dto.account.ManagerAccountProfileDto;
 
 public interface TicketServiceOwner {
-	// FIXME returns DTO
-	User findUser(String login);
+		
+	AccountProfileDtoForOwner findUser(String login);
 	
-	User addHallToManager(String hallId);
+	ManagerAccountProfileDto addHallToManager(String login, String hallId);
 	
-	User removeManagerRole(String login);
+	AccountProfileDtoForOwner removeManagerRole(String login);
 	
 	Set<Event> receiveHiddenEvents();
 	
-	Event approveEvent(EventId eventId);
+	EventApprovedDto approveEvent(EventId eventId);
 	
-	Seat generateTicket(SeatId seatId, String login);
+	Seat printTicket(SeatId seatId, String login);
 	
 	Seat discardTicket(SeatId seatId, String login);
 
