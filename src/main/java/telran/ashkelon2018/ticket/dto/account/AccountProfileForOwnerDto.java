@@ -15,7 +15,7 @@ import telran.ashkelon2018.ticket.enums.UserRole;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class AccountProfileDtoForOwner {
+public class AccountProfileForOwnerDto {
 	String login;
 	String name;
 	String phone;

@@ -7,18 +7,18 @@ import telran.ashkelon2018.ticket.domain.EventId;
 import telran.ashkelon2018.ticket.domain.Seat;
 import telran.ashkelon2018.ticket.domain.SeatId;
 import telran.ashkelon2018.ticket.dto.EventApprovedDto;
-import telran.ashkelon2018.ticket.dto.account.AccountProfileDtoForOwner;
+import telran.ashkelon2018.ticket.dto.account.AccountProfileForOwnerDto;
 import telran.ashkelon2018.ticket.dto.account.ManagerAccountProfileDto;
 
 public interface TicketServiceOwner {
 	
 	
 	//FIXME method for return ALL users	
-	AccountProfileDtoForOwner findUser(String login);
+	AccountProfileForOwnerDto findUser(String login);
 	
 	ManagerAccountProfileDto addHallToManager(String login, String hallId);
 	
-	AccountProfileDtoForOwner removeManagerRole(String login);
+	AccountProfileForOwnerDto removeManagerRole(String login);
 	
 	Set<Event> receiveHiddenEvents();
 	

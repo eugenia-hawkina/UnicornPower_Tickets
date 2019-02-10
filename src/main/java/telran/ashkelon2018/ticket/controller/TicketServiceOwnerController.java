@@ -15,7 +15,7 @@ import telran.ashkelon2018.ticket.domain.EventId;
 import telran.ashkelon2018.ticket.domain.Seat;
 import telran.ashkelon2018.ticket.domain.SeatId;
 import telran.ashkelon2018.ticket.dto.EventApprovedDto;
-import telran.ashkelon2018.ticket.dto.account.AccountProfileDtoForOwner;
+import telran.ashkelon2018.ticket.dto.account.AccountProfileForOwnerDto;
 import telran.ashkelon2018.ticket.dto.account.ManagerAccountProfileDto;
 import telran.ashkelon2018.ticket.service.TicketServiceOwner;
 
@@ -28,7 +28,7 @@ public class TicketServiceOwnerController {
 	TicketServiceOwner ticketServiceOwner;
 	
 	@GetMapping("/{login}")
-	public AccountProfileDtoForOwner findUser(@PathVariable String login) {
+	public AccountProfileForOwnerDto findUser(@PathVariable String login) {
 		return ticketServiceOwner.findUser(login);
 	}
 	
@@ -40,7 +40,7 @@ public class TicketServiceOwnerController {
 	}
 	
 	@DeleteMapping("/roles/{login}")
-	public AccountProfileDtoForOwner removeManagerRole(@PathVariable String login) {
+	public AccountProfileForOwnerDto removeManagerRole(@PathVariable String login) {
 		return ticketServiceOwner.removeManagerRole(login);
 	}
 	
