@@ -10,21 +10,21 @@ import telran.ashkelon2018.ticket.domain.SeatId;
 
 public interface TicketServiceUser {
 	
-	Set<Event> recieveUpcomingEvents();
+	Set<Event> receiveUpcomingEvents(int page, int size);
 	
-	Set<Event> receiveArchivedEvents();
+	Set<Event> receiveArchivedEvents(int page, int size);
 	
-	Set<Event> receiveEventsByDate(LocalDate from, LocalDate to);
+	Set<Event> receiveEventsByDate(LocalDate from, LocalDate to, int page, int size);
 	
-	Set<Event> receiveEventsByHall(String hallId);
+	Set<Event> receiveEventsByHall(String hallId, int page, int size);
 	
-	Set<Event> receiveEventsByArtist(String artist);
+	Set<Event> receiveEventsByArtist(String artist, int page, int size);
 	
 	Seat buyTicket(EventId eventId, SeatId seatId, String login);
 	
 	
 	// for registered only!!!
-	Set<Event> receiveVisitedEvents(String login);	
+	Set<Event> receiveVisitedEvents(String login, int page, int size);	
 	
 	Seat printTicket(SeatId seatId, String login);
 	

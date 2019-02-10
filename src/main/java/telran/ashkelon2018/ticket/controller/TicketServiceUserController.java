@@ -27,28 +27,29 @@ public class TicketServiceUserController {
 
 	
 	@GetMapping("/events")
-	public Set<Event> recieveUpcomingEvents(){
-		return ticketServiceUser.recieveUpcomingEvents();
+	public Set<Event> receiveUpcomingEvents(int page, int size){
+		return ticketServiceUser.receiveUpcomingEvents(page, size);
 	}
 	
 	@GetMapping("/events/archive")
-	public Set<Event> receiveArchivedEvents(){
-		return ticketServiceUser.receiveArchivedEvents();
+	public Set<Event> receiveArchivedEvents(int page, int size){
+		return ticketServiceUser.receiveArchivedEvents(page, size);
 	}
 	
 	@GetMapping("/events/dates")
-	public Set<Event> receiveEventsByDate(@RequestBody LocalDate from, LocalDate to){
-		return ticketServiceUser.receiveEventsByDate(from, to);
+	public Set<Event> receiveEventsByDate(@RequestBody LocalDate from, LocalDate to,
+			int page, int size){
+		return ticketServiceUser.receiveEventsByDate(from, to, page, size);
 	}
 	
 	@GetMapping("/events/hall/{hallId}")
-	public Set<Event> receiveEventsByHall(@PathVariable String hallId){
-		return ticketServiceUser.receiveEventsByHall(hallId);
+	public Set<Event> receiveEventsByHall(@PathVariable String hallId, int page, int size){
+		return ticketServiceUser.receiveEventsByHall(hallId, page, size);
 	}
 	
 	@GetMapping("/events/artist/{artist}")
-	public Set<Event> receiveEventsByArtist(@PathVariable String artist){
-		return ticketServiceUser.receiveEventsByArtist(artist);
+	public Set<Event> receiveEventsByArtist(@PathVariable String artist, int page, int size){
+		return ticketServiceUser.receiveEventsByArtist(artist, page, size);
 	}
 	
 	@PutMapping("event/ticket/purchase")
@@ -59,8 +60,8 @@ public class TicketServiceUserController {
 	
 	// for registered only!!!
 	@GetMapping("/events/visited")
-	Set<Event> receiveVisitedEvents(String login){
-		return ticketServiceUser.receiveVisitedEvents(login);
+	Set<Event> receiveVisitedEvents(String login, int page, int size){
+		return ticketServiceUser.receiveVisitedEvents(login, page, size);
 	}
 	
 	@GetMapping("/event/ticket/print")

@@ -22,6 +22,5 @@ public interface TicketServiceManager {
 	Set<Event> receiveEventList(EventListByDateDto filter, int page, int size);
 	
 	Event cancelEvent(EventCancellationDto eventCancellation);
-	
 
 }
