@@ -8,15 +8,15 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import telran.ashkelon2018.ticket.dao.ArchivedEventRepository;
-import telran.ashkelon2018.ticket.dao.CancelledEventRepository;
+import telran.ashkelon2018.ticket.dao.EventArchivedRepository;
+import telran.ashkelon2018.ticket.dao.EventCancelledRepository;
 import telran.ashkelon2018.ticket.dao.EventRepository;
 import telran.ashkelon2018.ticket.domain.Event;
 import telran.ashkelon2018.ticket.domain.EventCancelled;
 import telran.ashkelon2018.ticket.domain.EventId;
 import telran.ashkelon2018.ticket.domain.Seat;
 import telran.ashkelon2018.ticket.dto.EventCancellationDto;
-import telran.ashkelon2018.ticket.dto.EventListByDateDto;
+import telran.ashkelon2018.ticket.dto.EventListByHallDateDto;
 import telran.ashkelon2018.ticket.dto.NewEventDto;
 import telran.ashkelon2018.ticket.dto.SeatDto;
 import telran.ashkelon2018.ticket.dto.UpdateEventDto;
@@ -33,10 +33,10 @@ public class TicketServiceManagerImpl implements TicketServiceManager {
 	EventRepository eventRepository;
 	
 	@Autowired
-	CancelledEventRepository cancelledEventRepository;
+	EventCancelledRepository cancelledEventRepository;
 	
 	@Autowired
-	ArchivedEventRepository archivedEventRepository;
+	EventArchivedRepository archivedEventRepository;
 
 	
 	@Override
@@ -121,7 +121,7 @@ public class TicketServiceManagerImpl implements TicketServiceManager {
 	}
 
 	@Override
-	public Set<Event> receiveEventList(EventListByDateDto filter, int page, int size) {
+	public Set<Event> receiveEventList(EventListByHallDateDto filter, int page, int size) {
 		Set<Event> eventsAll = new HashSet<>();
 		LocalDate dateFrom = filter.getDateFrom();
 		LocalDate dateTo = filter.getDateTo();

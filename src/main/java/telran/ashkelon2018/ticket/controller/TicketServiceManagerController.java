@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import telran.ashkelon2018.ticket.domain.Event;
 import telran.ashkelon2018.ticket.domain.EventId;
 import telran.ashkelon2018.ticket.dto.EventCancellationDto;
-import telran.ashkelon2018.ticket.dto.EventListByDateDto;
+import telran.ashkelon2018.ticket.dto.EventListByHallDateDto;
 import telran.ashkelon2018.ticket.dto.NewEventDto;
 import telran.ashkelon2018.ticket.dto.UpdateEventDto;
 import telran.ashkelon2018.ticket.service.TicketServiceManager;
@@ -48,7 +48,7 @@ public class TicketServiceManagerController {
 	}	
 	
 	@PostMapping("/events/search")
-	public Set<Event> receiveEventList(@RequestBody EventListByDateDto filter, @RequestParam int page, @RequestParam int size){
+	public Set<Event> receiveEventList(@RequestBody EventListByHallDateDto filter, @RequestParam int page, @RequestParam int size){
 		return ticketService.receiveEventList(filter, page, size);
 	}
 	
