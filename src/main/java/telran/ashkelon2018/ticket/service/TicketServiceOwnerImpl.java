@@ -18,6 +18,7 @@ import telran.ashkelon2018.ticket.dto.EventApprovedDto;
 import telran.ashkelon2018.ticket.dto.account.AccountProfileDtoForOwner;
 import telran.ashkelon2018.ticket.dto.account.ManagerAccountProfileDto;
 
+
 @Service
 public class TicketServiceOwnerImpl implements TicketServiceOwner {
 	

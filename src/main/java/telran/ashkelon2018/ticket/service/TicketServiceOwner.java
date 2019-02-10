@@ -12,6 +12,7 @@ import telran.ashkelon2018.ticket.dto.account.ManagerAccountProfileDto;
 
 public interface TicketServiceOwner {
 	
+	
 	//FIXME method for return ALL users	
 	AccountProfileDtoForOwner findUser(String login);
 	
