@@ -85,6 +85,7 @@ public class TicketServiceManagerImpl implements TicketServiceManager {
 		event.setEventName(name);
 		event.setArtist(artist);
 		event.setDescription(description);
+		// FIXME problem - manager can approve event!!!!
 		event.setEventStatus(eventStatus);
 		event.setEventDurationMinutes(duration);
 		event.setEventType(type);

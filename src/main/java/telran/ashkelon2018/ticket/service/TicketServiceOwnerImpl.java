@@ -19,6 +19,7 @@ import telran.ashkelon2018.ticket.domain.UserAccount;
 import telran.ashkelon2018.ticket.dto.EventApprovedDto;
 import telran.ashkelon2018.ticket.dto.account.AccountProfileForOwnerDto;
 import telran.ashkelon2018.ticket.dto.account.ManagerAccountProfileDto;
+import telran.ashkelon2018.ticket.enums.EventStatus;
 import telran.ashkelon2018.ticket.enums.UserRole;
 import telran.ashkelon2018.ticket.exceptions.NotFoundException;
 import telran.ashkelon2018.ticket.exceptions.UserHasNotRightsException;
@@ -89,17 +90,17 @@ public class TicketServiceOwnerImpl implements TicketServiceOwner {
 
 	@Override
 	public Set<Event> receiveHiddenEvents() {
-		// FIXME without pagination
+		// without pagination
 		Set<Event> hiddenEvents = new HashSet<>();
-		hiddenEvents.addAll(eventRepository.findAllBy()
+		hiddenEvents.addAll(eventRepository.findByEventStatus(EventStatus.HIDDEN)
 			.collect(Collectors.toSet()));
 		return hiddenEvents;
 	}
 
 	public Set<Event> receiveHiddenEvents(int page, int size) {
-		// FIXME with pagination
+		// with pagination
 		Set<Event> hiddenEvents = new HashSet<>();
-		hiddenEvents.addAll(eventRepository.findAllBy()
+		hiddenEvents.addAll(eventRepository.findByEventStatus(EventStatus.HIDDEN)
 			.skip(size*(page-1))
 			.limit(size)
 			.collect(Collectors.toSet()));
