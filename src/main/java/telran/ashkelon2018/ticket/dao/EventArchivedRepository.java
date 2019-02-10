@@ -7,7 +7,7 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import telran.ashkelon2018.ticket.domain.EventArchived;
 import telran.ashkelon2018.ticket.domain.EventId;
 
-public interface ArchivedEventRepository extends MongoRepository<EventArchived, EventId> {
+public interface EventArchivedRepository extends MongoRepository<EventArchived, EventId> {
 
 	Stream<EventArchived> findAllBy();
 	

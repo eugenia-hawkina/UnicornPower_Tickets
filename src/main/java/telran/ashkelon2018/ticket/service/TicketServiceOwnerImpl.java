@@ -5,8 +5,8 @@ import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import telran.ashkelon2018.ticket.dao.ArchivedEventRepository;
-import telran.ashkelon2018.ticket.dao.CancelledEventRepository;
+import telran.ashkelon2018.ticket.dao.EventArchivedRepository;
+import telran.ashkelon2018.ticket.dao.EventCancelledRepository;
 import telran.ashkelon2018.ticket.dao.EventRepository;
 import telran.ashkelon2018.ticket.dao.UserAccountRepository;
 import telran.ashkelon2018.ticket.domain.Event;
@@ -29,10 +29,10 @@ public class TicketServiceOwnerImpl implements TicketServiceOwner {
 	EventRepository eventRepository;
 	
 	@Autowired
-	CancelledEventRepository cancelledEventRepository;
+	EventCancelledRepository cancelledEventRepository;
 	
 	@Autowired
-	ArchivedEventRepository archivedEventRepository;
+	EventArchivedRepository archivedEventRepository;
 
 	@Override
 	public AccountProfileDtoForOwner findUser(String login) {

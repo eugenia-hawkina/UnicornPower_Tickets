@@ -11,10 +11,11 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class EventListByDateDto {
+public class EventListByHallDateDto {
 	@JsonFormat(pattern = "yyyy-MM-dd")
 	LocalDate dateFrom;
 	@JsonFormat(pattern = "yyyy-MM-dd")
 	LocalDate dateTo;
+	String hallId;
 
 }

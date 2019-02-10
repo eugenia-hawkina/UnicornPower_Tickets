@@ -1,20 +1,21 @@
 package telran.ashkelon2018.ticket.service;
 
-import java.time.LocalDate;
 import java.util.Set;
 
 import telran.ashkelon2018.ticket.domain.Event;
+import telran.ashkelon2018.ticket.domain.EventArchived;
 import telran.ashkelon2018.ticket.domain.EventId;
 import telran.ashkelon2018.ticket.domain.Seat;
 import telran.ashkelon2018.ticket.domain.SeatId;
+import telran.ashkelon2018.ticket.dto.EventListByHallDateDto;
 
 public interface TicketServiceUser {
 	
 	Set<Event> receiveUpcomingEvents(int page, int size);
 	
-	Set<Event> receiveArchivedEvents(int page, int size);
+	Set<EventArchived> receiveArchivedEvents(int page, int size);
 	
-	Set<Event> receiveEventsByDate(LocalDate from, LocalDate to, int page, int size);
+	Set<Event> receiveEventsByDate(EventListByHallDateDto filter, int page, int size);
 	
 	Set<Event> receiveEventsByHall(String hallId, int page, int size);
 	
