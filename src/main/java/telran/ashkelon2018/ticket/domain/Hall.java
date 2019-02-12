@@ -5,6 +5,7 @@ import java.util.Set;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,8 +18,10 @@ import telran.ashkelon2018.ticket.enums.HallType;
 @Setter
 @NoArgsConstructor
 @ToString
+//@Builder
+//// FIXME why builder doesn't work
 @EqualsAndHashCode(of = "hallId")
-@Document(collection="ticketService_halls")
+@Document(collection="ticketService_Halls")
 public class Hall {
 	@Id 
 	String hallId;
@@ -30,15 +33,15 @@ public class Hall {
 	String street;
 	String builing;
 	HallType hallType;
-	Integer capacity;
+	Integer maxCapacity; 	//if there are no seats
 	@Singular
 	Set<String> managers;	// manager's id
 	Set<Seat> seats;
 	
 	
 	public Hall(String hallId, String locationName, String hallName, String country, 
-			String region, String city, String street, String builing, HallType hallType, 
-			Set<Seat> seats) {
+			String region, String city, String street, String builing, HallType hallType,
+			Integer maxCapacity) {
 		this.hallId = hallId;
 		this.locationName = locationName;
 		this.hallName = hallName;
@@ -48,7 +51,7 @@ public class Hall {
 		this.street = street;
 		this.builing = builing;
 		this.hallType = hallType;
-		this.seats = seats;
+		this.maxCapacity = maxCapacity;
 	}
 	
 	public void addManager(String manager) {

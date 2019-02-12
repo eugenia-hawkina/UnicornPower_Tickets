@@ -21,4 +21,8 @@ public interface EventRepository extends MongoRepository<Event, EventId> {
 	
 	Stream<Event> findByEventIdEventStartBetween(LocalDate from, LocalDate to);
 	
+	Stream<Event> findByEventIdHallId(String hallId);
+	
+	Stream<Event> findByArtist(String artist);
+	
 }

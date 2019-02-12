@@ -3,6 +3,7 @@ package telran.ashkelon2018.ticket.domain;
 import org.springframework.data.annotation.Id;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,6 +15,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
+@Builder
 @EqualsAndHashCode(of="seatId")
 public class Seat {
 	@Id 

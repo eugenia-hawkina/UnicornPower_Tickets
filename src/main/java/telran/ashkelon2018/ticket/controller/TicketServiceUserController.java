@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import telran.ashkelon2018.ticket.domain.Event;
@@ -29,28 +30,28 @@ public class TicketServiceUserController {
 
 	
 	@GetMapping("/events")
-	public Set<Event> receiveUpcomingEvents(int page, int size){
+	public Set<Event> receiveUpcomingEvents(@RequestParam int page, @RequestParam int size){
 		return ticketServiceUser.receiveUpcomingEvents(page, size);
 	}
 	
 	@GetMapping("/events/archive")
-	public Set<EventArchived> receiveArchivedEvents(int page, int size){
+	public Set<EventArchived> receiveArchivedEvents(@RequestParam int page, @RequestParam int size){
 		return ticketServiceUser.receiveArchivedEvents(page, size);
 	}
 	
 	@PostMapping("/events/dates")
 	public Set<Event> receiveEventsByDate(@RequestBody EventListByHallDateDto filter,
-			int page, int size){
+			@RequestParam int page, @RequestParam int size){
 		return ticketServiceUser.receiveEventsByDate(filter, page, size);
 	}
 	
 	@GetMapping("/events/hall/{hallId}")
-	public Set<Event> receiveEventsByHall(@PathVariable String hallId, int page, int size){
+	public Set<Event> receiveEventsByHall(@PathVariable String hallId, @RequestParam int page, @RequestParam int size){
 		return ticketServiceUser.receiveEventsByHall(hallId, page, size);
 	}
 	
 	@GetMapping("/events/artist/{artist}")
-	public Set<Event> receiveEventsByArtist(@PathVariable String artist, int page, int size){
+	public Set<Event> receiveEventsByArtist(@PathVariable String artist, @RequestParam int page, @RequestParam int size){
 		return ticketServiceUser.receiveEventsByArtist(artist, page, size);
 	}
 	
@@ -62,7 +63,7 @@ public class TicketServiceUserController {
 	
 	// for registered only!!!
 	@GetMapping("/events/visited")
-	Set<Event> receiveVisitedEvents(String login, int page, int size){
+	Set<Event> receiveVisitedEvents(String login, @RequestParam int page, @RequestParam int size){
 		return ticketServiceUser.receiveVisitedEvents(login, page, size);
 	}
 	

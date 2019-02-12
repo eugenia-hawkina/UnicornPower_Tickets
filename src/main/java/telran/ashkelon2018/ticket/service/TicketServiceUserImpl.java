@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import telran.ashkelon2018.ticket.dao.EventArchivedRepository;
 import telran.ashkelon2018.ticket.dao.EventCancelledRepository;
 import telran.ashkelon2018.ticket.dao.EventRepository;
+import telran.ashkelon2018.ticket.dao.HallRepository;
 import telran.ashkelon2018.ticket.domain.Event;
 import telran.ashkelon2018.ticket.domain.EventArchived;
 import telran.ashkelon2018.ticket.domain.EventId;
@@ -18,6 +19,7 @@ import telran.ashkelon2018.ticket.domain.Seat;
 import telran.ashkelon2018.ticket.domain.SeatId;
 import telran.ashkelon2018.ticket.dto.EventListByHallDateDto;
 import telran.ashkelon2018.ticket.exceptions.BadRequestException;
+import telran.ashkelon2018.ticket.exceptions.NotFoundException;
 
 @Service
 public class TicketServiceUserImpl implements TicketServiceUser {
@@ -30,6 +32,9 @@ public class TicketServiceUserImpl implements TicketServiceUser {
 	
 	@Autowired
 	EventArchivedRepository eventArchivedRepository;
+	
+	@Autowired
+	HallRepository hallRepository;
 
 	@Override
 	public Set<Event> receiveUpcomingEvents(int page, int size) {
@@ -53,6 +58,7 @@ public class TicketServiceUserImpl implements TicketServiceUser {
 
 	@Override
 	public Set<Event> receiveEventsByDate(EventListByHallDateDto filter, int page, int size) {
+		// FIXME
 		Set<Event> eventsAll = new HashSet<>();
 		LocalDate dateFrom = filter.getDateFrom();
 		LocalDate dateTo = filter.getDateTo();
@@ -68,15 +74,27 @@ public class TicketServiceUserImpl implements TicketServiceUser {
 
 	@Override
 	public Set<Event> receiveEventsByHall(String hallId, int page, int size) {
-		// TODO Auto-generated method stub
-		return null;
+		Set<Event> events = new HashSet<>();
+		if(!hallRepository.existsById(hallId)) {
+			throw new NotFoundException("Hall not found");
+		}
+		events.addAll(eventRepository.findByEventIdHallId(hallId)
+				.skip(size*(page-1))
+				.limit(size)
+				.collect(Collectors.toSet()));		
+		return events;
 	}
 
 	@Override
 	public Set<Event> receiveEventsByArtist(String artist, int page, int size) {
-		// TODO Auto-generated method stub
-		return null;
+		Set<Event> events = new HashSet<>();
+		events.addAll(eventRepository.findByArtist(artist)
+				.skip(size*(page-1))
+				.limit(size)
+				.collect(Collectors.toSet()));		
+		return events;
 	}
+	
 
 	@Override
 	public Seat buyTicket(EventId eventId, SeatId seatId, String login) {

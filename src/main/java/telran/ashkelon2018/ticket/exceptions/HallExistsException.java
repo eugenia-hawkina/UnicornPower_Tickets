@@ -6,16 +6,15 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
-@ResponseStatus(HttpStatus.FORBIDDEN)
-public class UserHasNotRightsException extends RuntimeException {
+@ResponseStatus(HttpStatus.CONFLICT)
+public class HallExistsException extends RuntimeException {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	
-	public UserHasNotRightsException(String message) {
+
+	public HallExistsException (String message) {
 		super(message);
 	}
-
 }

@@ -126,6 +126,9 @@ public class TicketServiceManagerImpl implements TicketServiceManager {
 		Set<Event> eventsAll = new HashSet<>();
 		LocalDate dateFrom = filter.getDateFrom();
 		LocalDate dateTo = filter.getDateTo();
+		if(dateFrom.isBefore(LocalDate.now()) || dateTo.isBefore(LocalDate.now())) {
+			// FIXME
+		}
 		String hallId = filter.getHallId();		
 		eventsAll.addAll(eventRepository.findByEventIdHallIdAndEventIdEventStartBetween(hallId, dateFrom, dateTo)
 				.skip(size*(page-1))

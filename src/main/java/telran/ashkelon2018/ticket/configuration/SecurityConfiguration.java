@@ -29,6 +29,9 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter{
 		// FIXME - session creation ??
 		http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED);
 		http.authorizeRequests().antMatchers("/event**").permitAll();
+		http.authorizeRequests().antMatchers("/user**").permitAll();
+//		// FIXME owner auth
+//		http.authorizeRequests().antMatchers("/owner**").permitAll();
 		 
 		http.authorizeRequests().antMatchers(HttpMethod.GET, "/account/manager").hasRole(UserRole.MANAGER.name());
 		http.authorizeRequests().antMatchers(HttpMethod.PUT, "/account/manager/update").hasRole(UserRole.MANAGER.name());
