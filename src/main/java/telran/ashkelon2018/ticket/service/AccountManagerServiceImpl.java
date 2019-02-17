@@ -39,7 +39,7 @@ public class AccountManagerServiceImpl implements AccountManagerService {
 				.phone(managerRegDto.getPhone())
 				.role(UserRole.MANAGER)
 				.role(UserRole.USER)
-				.build();
+				.build(); 
 		repository.save(manager);
 		return convertToManagerAccountProfileDto(manager);
 	}
