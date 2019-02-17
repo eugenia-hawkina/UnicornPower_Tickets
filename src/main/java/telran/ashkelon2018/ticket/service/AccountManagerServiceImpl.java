@@ -1,7 +1,5 @@
 package telran.ashkelon2018.ticket.service;
 
-import java.util.Set;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -11,8 +9,8 @@ import telran.ashkelon2018.ticket.configuration.AccountCredentials;
 import telran.ashkelon2018.ticket.dao.UserAccountRepository;
 import telran.ashkelon2018.ticket.domain.UserAccount;
 import telran.ashkelon2018.ticket.dto.account.ManagerAccountProfileDto;
-import telran.ashkelon2018.ticket.enums.UserRole;
 import telran.ashkelon2018.ticket.dto.account.ManagerRegDto;
+import telran.ashkelon2018.ticket.enums.UserRole;
 import telran.ashkelon2018.ticket.exceptions.UserExistsException;
 
 @Service
@@ -31,11 +29,17 @@ public class AccountManagerServiceImpl implements AccountManagerService {
 	public ManagerAccountProfileDto addManager(ManagerRegDto managerRegDto, String token) {
 		AccountCredentials credentials = accountConfiguration.tokenDecode(token);
 		if (repository.existsById(credentials.getLogin())) {
-			throw new UserExistsException();
+			throw new UserExistsException("User already exists");
 		}
 		String hashPassword = encoder.encode(credentials.getPassword());
-		UserAccount manager = UserAccount.builder().login(credentials.getLogin()).password(hashPassword)
-				.name(managerRegDto.getName()).phone(managerRegDto.getPhone()).role(UserRole.MANAGER).build();
+		UserAccount manager = UserAccount.builder()
+				.login(credentials.getLogin())
+				.password(hashPassword)
+				.name(managerRegDto.getName())
+				.phone(managerRegDto.getPhone())
+				.role(UserRole.MANAGER)
+				.role(UserRole.USER)
+				.build();
 		repository.save(manager);
 		return convertToManagerAccountProfileDto(manager);
 	}

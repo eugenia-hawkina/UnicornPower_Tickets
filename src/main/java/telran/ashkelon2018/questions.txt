@@ -1,4 +1,3 @@
 how to find all classes where this class is mentioned? (cross-references)
 
-why do we need noArgsConstr?
-
+find one element everywhere (set Seat -> map)

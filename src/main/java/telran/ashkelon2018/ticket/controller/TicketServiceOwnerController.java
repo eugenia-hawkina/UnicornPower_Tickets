@@ -1,5 +1,6 @@
 package telran.ashkelon2018.ticket.controller;
 
+import java.security.Principal;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -33,12 +34,11 @@ public class TicketServiceOwnerController {
 	TicketServiceOwner ticketServiceOwner;
 	
 	@GetMapping("/{login}")
-	public AccountProfileForOwnerDto findUser(@PathVariable String login) {
-		return ticketServiceOwner.findUser(login);
+	public AccountProfileForOwnerDto findUser(@PathVariable String login, Principal principal) {
+		return ticketServiceOwner.findUser(login, principal);
 	}
 	
 	@PutMapping("/{login}/hall/{hallId}")
-	// FIXME does put work with pathVarianle? or get only
 	public ManagerAccountProfileDto addHallToManager(@PathVariable String login, 
 			@PathVariable String hallId) {
 		return ticketServiceOwner.addHallToManager(login, hallId);

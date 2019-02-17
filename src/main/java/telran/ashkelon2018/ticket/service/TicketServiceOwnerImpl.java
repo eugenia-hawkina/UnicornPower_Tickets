@@ -1,11 +1,12 @@
 package telran.ashkelon2018.ticket.service;
 
+import java.security.Principal;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import telran.ashkelon2018.ticket.dao.EventArchivedRepository;
@@ -20,12 +21,10 @@ import telran.ashkelon2018.ticket.domain.Seat;
 import telran.ashkelon2018.ticket.domain.SeatId;
 import telran.ashkelon2018.ticket.domain.UserAccount;
 import telran.ashkelon2018.ticket.dto.EventApprovedDto;
-import telran.ashkelon2018.ticket.dto.HallDto;
 import telran.ashkelon2018.ticket.dto.NewHallDto;
 import telran.ashkelon2018.ticket.dto.account.AccountProfileForOwnerDto;
 import telran.ashkelon2018.ticket.dto.account.ManagerAccountProfileDto;
 import telran.ashkelon2018.ticket.enums.EventStatus;
-import telran.ashkelon2018.ticket.enums.HallType;
 import telran.ashkelon2018.ticket.enums.UserRole;
 import telran.ashkelon2018.ticket.exceptions.HallExistsException;
 import telran.ashkelon2018.ticket.exceptions.NotFoundException;
@@ -50,7 +49,13 @@ public class TicketServiceOwnerImpl implements TicketServiceOwner {
 	HallRepository hallRepository;
 
 	@Override
-	public AccountProfileForOwnerDto findUser(String login) {
+	public AccountProfileForOwnerDto findUser(String login, Principal principal) {
+		String id = principal.getName();
+		UserAccount owner = userAccountRepository.findById(id).orElse(null);
+		if(!owner.getRoles().contains(UserRole.OWNER)) {
+			throw new AccessDeniedException("Access denied, you are not an onwer");
+		}
+		
 		if (!userAccountRepository.existsById(login)) {
 			throw new NotFoundException("No such user");
 		}
@@ -167,7 +172,6 @@ public class TicketServiceOwnerImpl implements TicketServiceOwner {
 	}
 
 	private Hall convertNewHallDtoToHall(NewHallDto newHallDto) {
-		// FIXME builder doesn't work
 		return new Hall(newHallDto.getHallId(), newHallDto.getLocationName(), 
 				newHallDto.getHallName(), newHallDto.getCountry(), newHallDto.getRegion(), 
 				newHallDto.getCity(), newHallDto.getStreet(), newHallDto.getBuiling(), 

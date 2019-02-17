@@ -17,36 +17,36 @@ import telran.ashkelon2018.ticket.dto.account.ManagerAccountProfileDto;
 import telran.ashkelon2018.ticket.dto.account.ManagerRegDto;
 import telran.ashkelon2018.ticket.service.AccountManagerService;
 @RestController
-@RequestMapping("/account/manager")
+@RequestMapping("/account")
 public class AccountManagerServiceController {
 
 	@Autowired
 	AccountManagerService accountManagerService;
 	
 	
-	@PostMapping("/registration")
+	@PostMapping("/manager/registration")
 	public ManagerAccountProfileDto addManager(@RequestBody ManagerRegDto managerRegDto, 
 			@RequestHeader("Authorization") String token) {
 		return accountManagerService.addManager(managerRegDto, token);
 	}
 	
-	@GetMapping
+	@GetMapping("/login")
 	public ManagerAccountProfileDto loginManager(@RequestHeader("Authorization") String token) {
 		return accountManagerService.loginManager(token);
 	}
 	
-	@PutMapping("/update")
+	@PutMapping("/manager/update")
 	public ManagerAccountProfileDto editManager(@RequestBody ManagerRegDto managerRegDto, 
 			@RequestHeader("Authorization") String token) {		
 		return accountManagerService.editManager(managerRegDto, token);
 	}
 
-	@DeleteMapping("/remove")
+	@DeleteMapping("/manager/remove")
 	public ManagerAccountProfileDto removeManager(@RequestHeader("Authorization") String token) {
 		return accountManagerService.removeManager(token);
 	}
 		
-	@PutMapping("/password")
+	@PutMapping("/manager/password")
 	public boolean changePassword(@RequestHeader("X-Authorization") String password, 
 			@RequestHeader("Authorization") String token) {
 		return accountManagerService.changePassword(password, token);

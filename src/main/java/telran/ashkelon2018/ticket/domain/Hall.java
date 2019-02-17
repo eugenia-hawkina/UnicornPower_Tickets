@@ -5,6 +5,7 @@ import java.util.Set;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -18,8 +19,8 @@ import telran.ashkelon2018.ticket.enums.HallType;
 @Setter
 @NoArgsConstructor
 @ToString
-//@Builder
-//// FIXME why builder doesn't work
+@Builder
+@AllArgsConstructor
 @EqualsAndHashCode(of = "hallId")
 @Document(collection="ticketService_Halls")
 public class Hall {

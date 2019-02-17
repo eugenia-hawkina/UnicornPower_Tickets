@@ -1,5 +1,6 @@
 package telran.ashkelon2018.ticket.domain;
 
+import java.util.Map;
 import java.util.Set;
 
 import org.springframework.data.annotation.Id;
@@ -29,7 +30,7 @@ public class Event {
 	@Id 
 	EventId eventId;
 	Integer eventDurationMinutes;	
-	Set<Seat> seats;
+	Map<SeatId, Seat> seats;
 	EventType eventType; 
 	String description;
 	Set<String> images;
@@ -38,7 +39,7 @@ public class Event {
 	
 	
 	public Event(String eventName, String artist, EventId eventId,
-			Integer eventDurationMinutes, Set<Seat> seats, EventType eventType, String description, Set<String> images,
+			Integer eventDurationMinutes, Map<SeatId, Seat> seats, EventType eventType, String description, Set<String> images,
 			String userId) {
 		this.eventStatus = EventStatus.HIDDEN;
 		this.eventName = eventName;

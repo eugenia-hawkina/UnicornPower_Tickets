@@ -2,6 +2,7 @@ package telran.ashkelon2018.ticket.service;
 
 import java.time.LocalDate;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -15,6 +16,7 @@ import telran.ashkelon2018.ticket.domain.Event;
 import telran.ashkelon2018.ticket.domain.EventCancelled;
 import telran.ashkelon2018.ticket.domain.EventId;
 import telran.ashkelon2018.ticket.domain.Seat;
+import telran.ashkelon2018.ticket.domain.SeatId;
 import telran.ashkelon2018.ticket.dto.EventCancellationDto;
 import telran.ashkelon2018.ticket.dto.EventListByHallDateDto;
 import telran.ashkelon2018.ticket.dto.NewEventDto;
@@ -48,7 +50,7 @@ public class TicketServiceManagerImpl implements TicketServiceManager {
 		try { 
 			// FIXME - get id from token
 			String userId = "get from token";
-			Set<Seat> seats = convertSeatDtosToSeats(newEventDto.getSeatDto());		
+			Map<SeatId, Seat> seats = convertSeatDtosToSeats(newEventDto.getSeatDto());		
 			Event event = new Event(newEventDto.getEventName(), 
 					newEventDto.getArtist(), newEventDto.getEventId(), newEventDto.getEventDurationMinutes(),
 					seats, newEventDto.getEventType(), newEventDto.getDescription(), 
@@ -75,7 +77,7 @@ public class TicketServiceManagerImpl implements TicketServiceManager {
 		Integer duration = updateEventDto.getEventDurationMinutes();
 		EventType type = updateEventDto.getEventType();
 		Set<String> images = updateEventDto.getImages();
-		Set<Seat> seats = convertSeatDtosToSeats(updateEventDto.getSeatDto());
+		Map<SeatId, Seat> seats = convertSeatDtosToSeats(updateEventDto.getSeatDto());
 		
 		if(name==null || artist==null || description==null || eventStatus==null || duration==null 
 				|| type==null || images==null || seats==null) {
@@ -85,8 +87,12 @@ public class TicketServiceManagerImpl implements TicketServiceManager {
 		event.setEventName(name);
 		event.setArtist(artist);
 		event.setDescription(description);
-		// FIXME problem - manager can approve event!!!!
-		event.setEventStatus(eventStatus);
+		if ((event.getEventStatus().equals(EventStatus.ACTIVE) 
+						|| event.getEventStatus().equals(EventStatus.CANCELLED))
+				&& (eventStatus.equals(EventStatus.ACTIVE) 
+						|| eventStatus.equals(EventStatus.CANCELLED))) {
+			event.setEventStatus(eventStatus);
+		}		
 		event.setEventDurationMinutes(duration);
 		event.setEventType(type);
 		event.setImages(images);	
@@ -96,13 +102,13 @@ public class TicketServiceManagerImpl implements TicketServiceManager {
 		return event;
 	}
 
-	private Set<Seat> convertSeatDtosToSeats (Set<SeatDto> seatDto) {
+	private Map<SeatId, Seat> convertSeatDtosToSeats (Set<SeatDto> seatDto) {
 		if(seatDto == null) {
 			throw new RuntimeException("Alarm, no seats");
 		}
 		return seatDto.stream()
 				.map(sd -> new Seat(sd.getSeatId(), sd.getPriceRange(), true, false))
-				.collect(Collectors.toSet());	
+				.collect(Collectors.toMap(Seat::getSeatId, s -> s));	
 	}
 
 	@Override
@@ -126,14 +132,33 @@ public class TicketServiceManagerImpl implements TicketServiceManager {
 		Set<Event> eventsAll = new HashSet<>();
 		LocalDate dateFrom = filter.getDateFrom();
 		LocalDate dateTo = filter.getDateTo();
-		if(dateFrom.isBefore(LocalDate.now()) || dateTo.isBefore(LocalDate.now())) {
-			// FIXME
+		if(dateFrom == null || dateTo == null) {
+			throw new BadRequestException("I need two dates");
 		}
-		String hallId = filter.getHallId();		
-		eventsAll.addAll(eventRepository.findByEventIdHallIdAndEventIdEventStartBetween(hallId, dateFrom, dateTo)
-				.skip(size*(page-1))
-				.limit(size)
-				.collect(Collectors.toSet()));		
+		if(dateTo.isBefore(dateFrom)) {
+			LocalDate tmp = dateFrom;
+			dateFrom = dateTo;
+			dateTo = tmp;
+		}
+		String hallId = filter.getHallId();
+		if(dateFrom.isBefore(LocalDate.now()) && dateTo.isBefore(LocalDate.now())) {			
+			eventsAll.addAll(archivedEventRepository
+					.findByEventIdHallIdAndEventIdEventStartBetween(hallId, dateFrom, dateTo)
+					.skip(size * (page - 1))
+					.limit(size)
+					.collect(Collectors.toSet()));
+		}
+		if (dateFrom.isAfter(LocalDate.now()) && dateTo.isAfter(LocalDate.now())) {			
+			eventsAll.addAll(eventRepository
+					.findByEventIdHallIdAndEventIdEventStartBetween(hallId, dateFrom, dateTo)
+					.skip(size * (page - 1))
+					.limit(size)
+					.collect(Collectors.toSet()));
+		}
+		// FIXME combine info from two repositories
+		if(dateFrom.isBefore(LocalDate.now()) && dateTo.isAfter(LocalDate.now())) {
+			throw new BadRequestException("Both dates should be either beforeNow or afterNow");
+		}
 		return eventsAll;
 	}
 

@@ -2,6 +2,7 @@ package telran.ashkelon2018.ticket.service;
 
 import java.time.LocalDate;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -58,17 +59,35 @@ public class TicketServiceUserImpl implements TicketServiceUser {
 
 	@Override
 	public Set<Event> receiveEventsByDate(EventListByHallDateDto filter, int page, int size) {
-		// FIXME
 		Set<Event> eventsAll = new HashSet<>();
 		LocalDate dateFrom = filter.getDateFrom();
 		LocalDate dateTo = filter.getDateTo();
 		if(dateFrom == null || dateTo == null) {
 			throw new BadRequestException("I need two dates");
 		}
-		eventsAll.addAll(eventRepository.findByEventIdEventStartBetween(dateFrom, dateTo)
-				.skip(size*(page-1))
-				.limit(size)
-				.collect(Collectors.toSet()));		
+		if(dateTo.isBefore(dateFrom)) {
+			LocalDate tmp = dateFrom;
+			dateFrom = dateTo;
+			dateTo = tmp;
+		}
+		if(dateFrom.isBefore(LocalDate.now()) && dateTo.isBefore(LocalDate.now())) {			
+			eventsAll.addAll(eventArchivedRepository
+					.findByEventIdEventStartBetween(dateFrom, dateTo)
+					.skip(size * (page - 1))
+					.limit(size)
+					.collect(Collectors.toSet()));
+		}
+		if (dateFrom.isAfter(LocalDate.now()) && dateTo.isAfter(LocalDate.now())) {			
+			eventsAll.addAll(eventRepository
+					.findByEventIdEventStartBetween(dateFrom, dateTo)
+					.skip(size * (page - 1))
+					.limit(size)
+					.collect(Collectors.toSet()));
+		}
+		// FIXME combine info from two repositories
+		if(dateFrom.isBefore(LocalDate.now()) && dateTo.isAfter(LocalDate.now())) {
+			throw new BadRequestException("Both dates should be either beforeNow or afterNow");
+		}	
 		return eventsAll;
 	}
 
@@ -98,7 +117,16 @@ public class TicketServiceUserImpl implements TicketServiceUser {
 
 	@Override
 	public Seat buyTicket(EventId eventId, SeatId seatId, String login) {
-		// TODO Auto-generated method stub
+		// FIXME=TODO
+		Event event = eventRepository.findById(eventId).orElse(null);
+		if(event == null) {
+			throw new BadRequestException("No event found");
+		}
+		Map<SeatId, Seat> seats = event.getSeats();
+		
+		if(seats.get(seatId).isAvailability()) {
+			
+		}
 		return null;
 	}
 
