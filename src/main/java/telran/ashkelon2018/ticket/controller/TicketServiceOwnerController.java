@@ -40,48 +40,50 @@ public class TicketServiceOwnerController {
 	
 	@PutMapping("/{login}/hall/{hallId}")
 	public ManagerAccountProfileDto addHallToManager(@PathVariable String login, 
-			@PathVariable String hallId) {
-		return ticketServiceOwner.addHallToManager(login, hallId);
+			@PathVariable String hallId, Principal principal) {
+		return ticketServiceOwner.addHallToManager(login, hallId, principal);
 	}
 	
 	@DeleteMapping("/roles/{login}")
-	public AccountProfileForOwnerDto removeManagerRole(@PathVariable String login) {
-		return ticketServiceOwner.removeManagerRole(login);
+	public AccountProfileForOwnerDto removeManagerRole(@PathVariable String login, Principal principal) {
+		return ticketServiceOwner.removeManagerRole(login, principal);
 	}
 	
 	@GetMapping("/events/hidden")
-	public Set<Event> receiveHiddenEvents(){
-		return ticketServiceOwner.receiveHiddenEvents();
+	public Set<Event> receiveHiddenEvents(Principal principal){
+		return ticketServiceOwner.receiveHiddenEvents(principal);
 	}
 	
 	@PutMapping("/event/approve")
-	public EventApprovedDto approveEvent(EventId eventId) {
-		return ticketServiceOwner.approveEvent(eventId);
+	public EventApprovedDto approveEvent(EventId eventId, Principal principal) {
+		return ticketServiceOwner.approveEvent(eventId, principal);
 	}
 	
 	
 	@GetMapping("/event/ticket/print")
-	Seat printTicket(SeatId seatId, String login) {
-		return ticketServiceOwner.printTicket(seatId, login);
+	Seat printTicket(SeatId seatId, String login, Principal principal) {
+		return ticketServiceOwner.printTicket(seatId, login, principal);
 	}
 	
 	@DeleteMapping("/event/ticket/discard")
-	Seat discardTicket(SeatId seatId, String login) {
-		return ticketServiceOwner.discardTicket(seatId, login);
+	Seat discardTicket(SeatId seatId, String login, Principal principal) {
+		return ticketServiceOwner.discardTicket(seatId, login, principal);
 	}
 	
 	@GetMapping("/users")
-	Set<AccountProfileForOwnerDto> findAllUsers(@RequestParam int page, @RequestParam int size){
-		return ticketServiceOwner.findAllUsers(page, size);
+	Set<AccountProfileForOwnerDto> findAllUsers(@RequestParam int page, 
+			@RequestParam int size, Principal principal){
+		return ticketServiceOwner.findAllUsers(page, size, principal);
 	}
 	
 	@PostMapping("/hall/new")
-	boolean addHall(@RequestBody NewHallDto newHallDto) {
-		return ticketServiceOwner.addHall(newHallDto);
+	boolean addHall(@RequestBody NewHallDto newHallDto, Principal principal) {
+		return ticketServiceOwner.addHall(newHallDto, principal);
 	}
 
 	@PutMapping("/hall/{hallId}/capacity/{maxCapacity}")
-	NewHallDto changeMaxCapacityToHall(@PathVariable String hallId, @PathVariable Integer maxCapacity) {
-		return ticketServiceOwner.changeMaxCapacityToHall(hallId, maxCapacity);
+	NewHallDto changeMaxCapacityToHall(@PathVariable String hallId, 
+			@PathVariable Integer maxCapacity, Principal principal) {
+		return ticketServiceOwner.changeMaxCapacityToHall(hallId, maxCapacity, principal);
 	}
 }

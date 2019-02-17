@@ -26,7 +26,6 @@ public class Event {
 	EventStatus eventStatus;
 	String eventName;
 	String artist;
-	// @EmbeddedId - for sql
 	@Id 
 	EventId eventId;
 	Integer eventDurationMinutes;	

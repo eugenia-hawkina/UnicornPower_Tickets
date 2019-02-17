@@ -46,7 +46,7 @@ public class AccountManagerServiceController {
 		return accountManagerService.removeManager(token);
 	}
 		
-	@PutMapping("/manager/password")
+	@PutMapping("/password")
 	public boolean changePassword(@RequestHeader("X-Authorization") String password, 
 			@RequestHeader("Authorization") String token) {
 		return accountManagerService.changePassword(password, token);

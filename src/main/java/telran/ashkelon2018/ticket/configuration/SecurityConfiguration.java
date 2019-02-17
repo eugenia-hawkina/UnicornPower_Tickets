@@ -18,7 +18,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter{
 	
 	@Override
 	public void configure(WebSecurity web) {
-//		web.ignoring().antMatchers("/event*/**");
 		web.ignoring().antMatchers(HttpMethod.POST, "/account/manager/registration");
 	}
 
@@ -26,14 +25,13 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter{
 	public void configure(HttpSecurity http) throws Exception {
 		http.httpBasic();
 		http.csrf().disable();
-		// FIXME - session creation ??
 		http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 		http.authorizeRequests().antMatchers("/user/**").permitAll();
 		 
 		http.authorizeRequests().antMatchers(HttpMethod.GET, "/account/manager").hasRole(UserRole.MANAGER.name());
 		http.authorizeRequests().antMatchers(HttpMethod.PUT, "/account/manager/update").hasRole(UserRole.MANAGER.name());
-		http.authorizeRequests().antMatchers(HttpMethod.PUT, "/account/manager/password").hasRole(UserRole.MANAGER.name());
-		// FIXME permit psw change to all users
+		http.authorizeRequests().antMatchers(HttpMethod.PUT, "/account/password").permitAll();
+		// FIXME permit psw change to all users;; hasAnyRole() - doesn't work
 		http.authorizeRequests().antMatchers(HttpMethod.DELETE, "/account/manager/remove").hasRole(UserRole.MANAGER.name());
 		http.authorizeRequests().antMatchers("/owner/**").hasRole(UserRole.OWNER.name());
 	}

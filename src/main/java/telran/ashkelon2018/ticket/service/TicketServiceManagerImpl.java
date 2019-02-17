@@ -43,8 +43,9 @@ public class TicketServiceManagerImpl implements TicketServiceManager {
 	
 	@Override
 	public Event addEvent(NewEventDto newEventDto) {
-		Event eventCheck = eventRepository.findById(newEventDto.getEventId()).orElse(null);
-		if( eventCheck != null) {
+		//Event eventCheck = eventRepository.findById(newEventDto.getEventId()).orElse(null);
+		boolean eventCheck = eventRepository.existsById(newEventDto.getEventId());
+		if( eventCheck ) {
 			throw new EventExistsException("Sorry, event already exists");
 		}
 		try { 

@@ -75,7 +75,12 @@ public class TicketServiceOwnerImpl implements TicketServiceOwner {
 	}
 
 	@Override
-	public ManagerAccountProfileDto addHallToManager(String login, String hallId) {
+	public ManagerAccountProfileDto addHallToManager(String login, String hallId, Principal principal) {
+		String id = principal.getName();
+		UserAccount owner = userAccountRepository.findById(id).orElse(null);
+		if(!owner.getRoles().contains(UserRole.OWNER)) {
+			throw new AccessDeniedException("Access denied, you are not an onwer");
+		}
 		if (!hallRepository.existsById(hallId)) {
 			throw new NotFoundException("No such hall");
 		}
@@ -101,7 +106,12 @@ public class TicketServiceOwnerImpl implements TicketServiceOwner {
 	}
 
 	@Override
-	public AccountProfileForOwnerDto removeManagerRole(String login) {
+	public AccountProfileForOwnerDto removeManagerRole(String login, Principal principal) {
+		String id = principal.getName();
+		UserAccount owner = userAccountRepository.findById(id).orElse(null);
+		if(!owner.getRoles().contains(UserRole.OWNER)) {
+			throw new AccessDeniedException("Access denied, you are not an onwer");
+		}
 		if (!userAccountRepository.existsById(login)) {
 			throw new NotFoundException("No such user");
 		}
@@ -115,16 +125,30 @@ public class TicketServiceOwnerImpl implements TicketServiceOwner {
 	}
 
 	@Override
-	public Set<Event> receiveHiddenEvents() {
+	public Set<Event> receiveHiddenEvents(Principal principal) {
 		// without pagination
+		String id = principal.getName();
+		UserAccount owner = userAccountRepository.findById(id).orElse(null);
+		if(!owner.getRoles().contains(UserRole.OWNER)) {
+			throw new AccessDeniedException("Access denied, you are not an onwer");
+		}
 		Set<Event> hiddenEvents = new HashSet<>();
 		hiddenEvents.addAll(eventRepository.findByEventStatus(EventStatus.HIDDEN)
+				// FIXME 
+// No converter found capable of converting from type 
+//[telran.ashkelon2018.ticket.domain.SeatId] to type [java.util.Map<?, ?>]
+
 				.collect(Collectors.toSet()));
 		return hiddenEvents;
 	}
 
-	public Set<Event> receiveHiddenEvents(int page, int size) {
+	public Set<Event> receiveHiddenEvents(int page, int size, Principal principal) {
 		// with pagination
+		String id = principal.getName();
+		UserAccount owner = userAccountRepository.findById(id).orElse(null);
+		if(!owner.getRoles().contains(UserRole.OWNER)) {
+			throw new AccessDeniedException("Access denied, you are not an onwer");
+		}
 		Set<Event> hiddenEvents = new HashSet<>();
 		hiddenEvents.addAll(eventRepository.findByEventStatus(EventStatus.HIDDEN)
 				.skip(size * (page - 1))
@@ -134,25 +158,42 @@ public class TicketServiceOwnerImpl implements TicketServiceOwner {
 	}
 
 	@Override
-	public EventApprovedDto approveEvent(EventId eventId) {
+	public EventApprovedDto approveEvent(EventId eventId, Principal principal) {
+		String id = principal.getName();
+		UserAccount owner = userAccountRepository.findById(id).orElse(null);
+		if(!owner.getRoles().contains(UserRole.OWNER)) {
+			throw new AccessDeniedException("Access denied, you are not an onwer");
+		}
+		// TODO Auto-generated method stub
+		
+		return null;
+	}
+
+	@Override
+	public Seat printTicket(SeatId seatId, String login, Principal principal) {
+		String id = principal.getName();
+		UserAccount owner = userAccountRepository.findById(id).orElse(null);
+		if(!owner.getRoles().contains(UserRole.OWNER)) {
+			throw new AccessDeniedException("Access denied, you are not an onwer");
+		}
+		// TODO Auto-generated method stub		
+		
+		return null;
+	}
+
+	@Override
+	public Seat discardTicket(SeatId seatId, String login, Principal principal) {
+		String id = principal.getName();
+		UserAccount owner = userAccountRepository.findById(id).orElse(null);
+		if(!owner.getRoles().contains(UserRole.OWNER)) {
+			throw new AccessDeniedException("Access denied, you are not an onwer");
+		}
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Seat printTicket(SeatId seatId, String login) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Seat discardTicket(SeatId seatId, String login) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Set<AccountProfileForOwnerDto> findAllUsers(int page, int size) {
+	public Set<AccountProfileForOwnerDto> findAllUsers(int page, int size, Principal principal) {
 		Set<AccountProfileForOwnerDto> allUsers = new HashSet<>();
 		allUsers = userAccountRepository.findAllBy()
 			.skip(size * (page - 1))
@@ -163,7 +204,7 @@ public class TicketServiceOwnerImpl implements TicketServiceOwner {
 	}
 
 	@Override
-	public boolean addHall(NewHallDto newHallDto) {
+	public boolean addHall(NewHallDto newHallDto, Principal principal) {
 		if(hallRepository.existsById(newHallDto.getHallId())) {
 			throw new HallExistsException("Hall already exists");
 		}
@@ -179,7 +220,7 @@ public class TicketServiceOwnerImpl implements TicketServiceOwner {
 	}
 
 	@Override
-	public NewHallDto changeMaxCapacityToHall(String hallId, Integer maxCapacity) {
+	public NewHallDto changeMaxCapacityToHall(String hallId, Integer maxCapacity, Principal principal) {
 		if (!hallRepository.existsById(hallId)) {
 			throw new NotFoundException("No such hall");
 		}

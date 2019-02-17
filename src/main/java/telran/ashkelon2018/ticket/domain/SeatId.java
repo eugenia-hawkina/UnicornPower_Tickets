@@ -3,6 +3,7 @@ package telran.ashkelon2018.ticket.domain;
 import java.io.Serializable;
 
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -14,6 +15,7 @@ import telran.ashkelon2018.ticket.enums.AccessType;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
+@EqualsAndHashCode
 public class SeatId implements Serializable{
 	/**
 	 * 

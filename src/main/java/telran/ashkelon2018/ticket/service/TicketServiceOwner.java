@@ -18,21 +18,21 @@ public interface TicketServiceOwner {
 	
 	AccountProfileForOwnerDto findUser(String login, Principal principal);
 	
-	Set<AccountProfileForOwnerDto> findAllUsers(int page, int size);
+	Set<AccountProfileForOwnerDto> findAllUsers(int page, int size, Principal principal);
 	
-	ManagerAccountProfileDto addHallToManager(String login, String hallId);
+	ManagerAccountProfileDto addHallToManager(String login, String hallId, Principal principal);
 	
-	AccountProfileForOwnerDto removeManagerRole(String login);
+	AccountProfileForOwnerDto removeManagerRole(String login, Principal principal);
 	
-	Set<Event> receiveHiddenEvents();
+	Set<Event> receiveHiddenEvents(Principal principal);
 	
-	EventApprovedDto approveEvent(EventId eventId);
+	EventApprovedDto approveEvent(EventId eventId, Principal principal);
 	
-	Seat printTicket(SeatId seatId, String login);
+	Seat printTicket(SeatId seatId, String login, Principal principal);
 	
-	Seat discardTicket(SeatId seatId, String login);
+	Seat discardTicket(SeatId seatId, String login, Principal principal);
 	
-	boolean addHall(NewHallDto newHallDto);
+	boolean addHall(NewHallDto newHallDto, Principal principal);
 
-	NewHallDto changeMaxCapacityToHall(String hallId, Integer maxCapacity);
+	NewHallDto changeMaxCapacityToHall(String hallId, Integer maxCapacity, Principal principal);
 }
