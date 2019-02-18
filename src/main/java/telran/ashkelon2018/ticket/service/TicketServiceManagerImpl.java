@@ -2,7 +2,6 @@ package telran.ashkelon2018.ticket.service;
 
 import java.time.LocalDate;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -16,7 +15,6 @@ import telran.ashkelon2018.ticket.domain.Event;
 import telran.ashkelon2018.ticket.domain.EventCancelled;
 import telran.ashkelon2018.ticket.domain.EventId;
 import telran.ashkelon2018.ticket.domain.Seat;
-import telran.ashkelon2018.ticket.domain.SeatId;
 import telran.ashkelon2018.ticket.dto.EventCancellationDto;
 import telran.ashkelon2018.ticket.dto.EventListByHallDateDto;
 import telran.ashkelon2018.ticket.dto.NewEventDto;
@@ -43,15 +41,14 @@ public class TicketServiceManagerImpl implements TicketServiceManager {
 	
 	@Override
 	public Event addEvent(NewEventDto newEventDto) {
-		//Event eventCheck = eventRepository.findById(newEventDto.getEventId()).orElse(null);
-		boolean eventCheck = eventRepository.existsById(newEventDto.getEventId());
-		if( eventCheck ) {
+		Event eventCheck = eventRepository.findById(newEventDto.getEventId()).orElse(null);
+		if(eventCheck != null) {
 			throw new EventExistsException("Sorry, event already exists");
 		}
 		try { 
 			// FIXME - get id from token
 			String userId = "get from token";
-			Map<SeatId, Seat> seats = convertSeatDtosToSeats(newEventDto.getSeatDto());		
+			Set <Seat> seats = convertSeatDtosToSeats(newEventDto.getSeatDto());		
 			Event event = new Event(newEventDto.getEventName(), 
 					newEventDto.getArtist(), newEventDto.getEventId(), newEventDto.getEventDurationMinutes(),
 					seats, newEventDto.getEventType(), newEventDto.getDescription(), 
@@ -78,7 +75,7 @@ public class TicketServiceManagerImpl implements TicketServiceManager {
 		Integer duration = updateEventDto.getEventDurationMinutes();
 		EventType type = updateEventDto.getEventType();
 		Set<String> images = updateEventDto.getImages();
-		Map<SeatId, Seat> seats = convertSeatDtosToSeats(updateEventDto.getSeatDto());
+		Set<Seat> seats = convertSeatDtosToSeats(updateEventDto.getSeatDto());
 		
 		if(name==null || artist==null || description==null || eventStatus==null || duration==null 
 				|| type==null || images==null || seats==null) {
@@ -103,13 +100,13 @@ public class TicketServiceManagerImpl implements TicketServiceManager {
 		return event;
 	}
 
-	private Map<SeatId, Seat> convertSeatDtosToSeats (Set<SeatDto> seatDto) {
+	private Set <Seat> convertSeatDtosToSeats (Set<SeatDto> seatDto) {
 		if(seatDto == null) {
 			throw new RuntimeException("Alarm, no seats");
 		}
-		return seatDto.stream()
+		return seatDto.stream()	
 				.map(sd -> new Seat(sd.getSeatId(), sd.getPriceRange(), true, false))
-				.collect(Collectors.toMap(Seat::getSeatId, s -> s));	
+				.collect(Collectors.toSet());	
 	}
 
 	@Override

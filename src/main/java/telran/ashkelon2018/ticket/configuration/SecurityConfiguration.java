@@ -15,7 +15,7 @@ import telran.ashkelon2018.ticket.enums.UserRole;
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled=true)
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter{
-	
+	 
 	@Override
 	public void configure(WebSecurity web) {
 		web.ignoring().antMatchers(HttpMethod.POST, "/account/manager/registration");

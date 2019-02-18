@@ -1,6 +1,5 @@
 package telran.ashkelon2018.ticket.domain;
 
-import java.util.Map;
 import java.util.Set;
 
 import org.springframework.data.annotation.Id;
@@ -29,7 +28,7 @@ public class EventArchived {
 	@Id 
 	EventId eventId;
 	Integer eventDurationMinutes;	
-	Map<SeatId, Seat> seats;
+	Set <Seat> seats;
 	EventType eventType; 
 	String description;
 	Set<String> images;

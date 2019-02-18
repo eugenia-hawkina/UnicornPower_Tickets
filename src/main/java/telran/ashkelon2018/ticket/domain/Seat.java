@@ -16,7 +16,7 @@ import lombok.ToString;
 @AllArgsConstructor
 @ToString
 @Builder
-@EqualsAndHashCode(of="seatId")
+@EqualsAndHashCode(of= {"seatId"})
 public class Seat {
 	@Id 
 	SeatId seatId;

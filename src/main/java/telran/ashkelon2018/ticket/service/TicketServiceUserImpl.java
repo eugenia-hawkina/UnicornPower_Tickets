@@ -2,7 +2,6 @@ package telran.ashkelon2018.ticket.service;
 
 import java.time.LocalDate;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -122,11 +121,11 @@ public class TicketServiceUserImpl implements TicketServiceUser {
 		if(event == null) {
 			throw new BadRequestException("No event found");
 		}
-		Map<SeatId, Seat> seats = event.getSeats();
+		Set <Seat> seats = event.getSeats();
 		
-		if(seats.get(seatId).isAvailability()) {
-			
-		}
+//		if(seats.get(seatId).isAvailability()) {
+//			
+//		}
 		return null;
 	}
 
