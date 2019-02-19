@@ -6,6 +6,10 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 
 import telran.ashkelon2018.ticket.dao.EventArchivedRepository;
@@ -35,6 +39,9 @@ public class TicketServiceUserImpl implements TicketServiceUser {
 	
 	@Autowired
 	HallRepository hallRepository;
+	
+	@Autowired
+	MongoTemplate mongoTemplate;
 
 	@Override
 	public Set<Event> receiveUpcomingEvents(int page, int size) {
@@ -121,11 +128,17 @@ public class TicketServiceUserImpl implements TicketServiceUser {
 		if(event == null) {
 			throw new BadRequestException("No event found");
 		}
-		Set <Seat> seats = event.getSeats();
 		
-//		if(seats.get(seatId).isAvailability()) {
-//			
-//		}
+		
+		Query query = new Query();
+		Criteria criteria = Criteria.where("_id").is(eventId).and("seats._id").is(seatId);
+		query.addCriteria(criteria);
+		Update update = new Update();
+		update.set("description", "Simply Semenovich");
+		event = mongoTemplate.findAndModify(query, update, Event.class);
+		
+		
+
 		return null;
 	}
 
