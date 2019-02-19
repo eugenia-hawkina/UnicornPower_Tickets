@@ -133,7 +133,7 @@ public class TicketServiceManagerImpl implements TicketServiceManager {
 		}
 		return event;
 	}
-
+ 
 	@Override
 	public Set<Event> receiveUserUpcomingEvents(Principal principal) {
 		String id = principal.getName();
