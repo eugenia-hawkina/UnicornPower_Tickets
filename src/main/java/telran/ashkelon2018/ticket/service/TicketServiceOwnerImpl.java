@@ -25,7 +25,6 @@ import telran.ashkelon2018.ticket.dto.NewHallDto;
 import telran.ashkelon2018.ticket.dto.account.AccountProfileForOwnerDto;
 import telran.ashkelon2018.ticket.dto.account.ManagerAccountProfileDto;
 import telran.ashkelon2018.ticket.enums.EventStatus;
-import telran.ashkelon2018.ticket.enums.EventType;
 import telran.ashkelon2018.ticket.enums.UserRole;
 import telran.ashkelon2018.ticket.exceptions.BadRequestException;
 import telran.ashkelon2018.ticket.exceptions.HallExistsException;

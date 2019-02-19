@@ -7,7 +7,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import telran.ashkelon2018.ticket.dao.EventArchivedRepository;
@@ -27,6 +26,7 @@ import telran.ashkelon2018.ticket.dto.UpdateEventDto;
 import telran.ashkelon2018.ticket.enums.EventStatus;
 import telran.ashkelon2018.ticket.enums.EventType;
 import telran.ashkelon2018.ticket.enums.UserRole;
+import telran.ashkelon2018.ticket.exceptions.AccessDeniedException;
 import telran.ashkelon2018.ticket.exceptions.BadRequestException;
 import telran.ashkelon2018.ticket.exceptions.EventExistsException;
 import telran.ashkelon2018.ticket.exceptions.NotFoundException;
@@ -77,10 +77,14 @@ public class TicketServiceManagerImpl implements TicketServiceManager {
 
 	@Override
 	public Event updateEvent(UpdateEventDto updateEventDto, Principal principal) {
-		// FIXME - auth
+		String id = principal.getName();
+		UserAccount manager = userAccountRepository.findById(id).orElse(null);
+		if(!manager.getRoles().contains(UserRole.MANAGER)) {
+			throw new AccessDeniedException("Access denied, you are not a manager");
+		}
 		Event event = eventRepository.findById(updateEventDto.getEventId()).orElse(null);
 		if(event == null) {
-			throw new NotFoundException("Nicht Aufgefunden!");
+			throw new NotFoundException("Event not found");
 		}
 		String name = updateEventDto.getEventName();
 		String artist = updateEventDto.getArtist();
@@ -93,9 +97,8 @@ public class TicketServiceManagerImpl implements TicketServiceManager {
 		
 		if(name==null || artist==null || description==null || eventStatus==null || duration==null 
 				|| type==null || images==null || seats==null) {
-			throw new BadRequestException("I need more information!");
+			throw new BadRequestException("More information needed");
 		}
-		
 		event.setEventName(name);
 		event.setArtist(artist);
 		event.setDescription(description);
@@ -108,8 +111,7 @@ public class TicketServiceManagerImpl implements TicketServiceManager {
 		event.setEventDurationMinutes(duration);
 		event.setEventType(type);
 		event.setImages(images);	
-		event.setSeats(seats);
-		
+		event.setSeats(seats);		
 		eventRepository.save(event);
 		return event;
 	}
@@ -125,18 +127,18 @@ public class TicketServiceManagerImpl implements TicketServiceManager {
 
 	@Override
 	public Event receiveEventInfo(EventId eventId) {
-		// FIXME - auth
 		Event event = eventRepository.findById(eventId).orElse(null);
 		if(event == null) {
-			throw new NotFoundException("Nicht Aufgefunden!");
+			throw new NotFoundException("Event not found");
 		}
 		return event;
 	}
 
 	@Override
 	public Set<Event> receiveUserUpcomingEvents(Principal principal) {
-		// TODO Auto-generated method stub - from token
-		return null;
+		String id = principal.getName();
+		Set<Event> events = eventRepository.findByUserId(id);
+		return events;
 	}
 
 	@Override
@@ -176,17 +178,29 @@ public class TicketServiceManagerImpl implements TicketServiceManager {
 
 	@Override
 	public Event cancelEvent(EventCancellationDto eventCancellation, Principal principal) {
-		// FIXME - auth
-		EventId id = eventCancellation.getEventId();
-		Event event = eventRepository.findById(id).orElse(null);
-		if(event == null) {
-			throw new NotFoundException("Nicht Aufgefunden!");
+		String managerId = principal.getName();
+		UserAccount manager = userAccountRepository.findById(managerId).orElse(null);
+		if(!manager.getRoles().contains(UserRole.MANAGER)) {
+			throw new AccessDeniedException("Access denied, you are not a manager");
 		}
-		event.setCancellationReason(eventCancellation.getReason());
+		EventId eventId = eventCancellation.getEventId();
+		Event event = eventRepository.findById(eventId).orElse(null);
+		if(event == null) {
+			throw new NotFoundException("Event not found");
+		}
+		if(!event.getUserId().equals(managerId)) {
+			System.out.println("not your event");
+			throw new AccessDeniedException("Access denied, that is not your event");
+		}
+		String cancellationReason = eventCancellation.getReason();
+		if(cancellationReason == null || cancellationReason == "") {
+			throw new BadRequestException("Cancellation reason needed");
+		}
+		event.setCancellationReason(cancellationReason);
 		event.setEventStatus(EventStatus.CANCELLED);
 		EventCancelled cancelledEvent = new EventCancelled(event);
-		cancelledEventRepository.save(cancelledEvent);		
-		eventRepository.deleteById(id);
+		cancelledEventRepository.save(cancelledEvent);	
+		eventRepository.deleteById(eventId);
 		return event;
 	}
 

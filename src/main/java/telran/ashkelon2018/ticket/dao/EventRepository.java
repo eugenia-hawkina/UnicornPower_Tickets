@@ -1,6 +1,7 @@
 package telran.ashkelon2018.ticket.dao;
 
 import java.time.LocalDate;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
@@ -13,7 +14,7 @@ public interface EventRepository extends MongoRepository<Event, EventId> {
 	
 	Stream<Event> findAllBy();
 	
-	Iterable<Event> findByUserId(String userId);
+	Set<Event> findByUserId(String userId);
 	
 	Stream<Event> findByEventStatus(EventStatus eventStatus);
 	

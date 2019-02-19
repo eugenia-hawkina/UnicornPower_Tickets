@@ -14,6 +14,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.Singular;
+import lombok.ToString;
 import telran.ashkelon2018.ticket.enums.UserRole;
 
 @Getter
@@ -21,6 +22,7 @@ import telran.ashkelon2018.ticket.enums.UserRole;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@ToString
 @EqualsAndHashCode(of="login")
 @Document(collection="ticketService_Users")
 public class UserAccount {

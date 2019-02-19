@@ -76,7 +76,6 @@ public class AccountManagerServiceImpl implements AccountManagerService {
 	}
 
 	@Override
-	//FIXME doesn't work with principal
 	public boolean changePassword(String password, String token) {
 		try {
 			AccountCredentials credentials = accountConfiguration.tokenDecode(token);

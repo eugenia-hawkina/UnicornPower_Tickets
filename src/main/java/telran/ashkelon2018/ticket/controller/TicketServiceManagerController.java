@@ -42,7 +42,6 @@ public class TicketServiceManagerController {
 		return ticketService.receiveEventInfo(eventId);
 	}
 
-	// FIXME // userId from token
 	@GetMapping("/manager/events")
 	public Set<Event> receiveUserUpcomingEvents(Principal principal){
 		return ticketService.receiveUserUpcomingEvents(principal);
