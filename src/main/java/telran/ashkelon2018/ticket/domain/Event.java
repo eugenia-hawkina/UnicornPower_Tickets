@@ -48,6 +48,7 @@ public class Event {
 		this.eventType = eventType;
 		this.description = description;
 		this.images = images;
+		this.userId = userId;
 	}
 
 	public Event(EventArchived eventArchived) {

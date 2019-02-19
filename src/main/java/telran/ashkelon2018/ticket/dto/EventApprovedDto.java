@@ -2,6 +2,7 @@ package telran.ashkelon2018.ticket.dto;
 
 import lombok.Setter;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import telran.ashkelon2018.ticket.domain.EventId;
@@ -12,6 +13,7 @@ import telran.ashkelon2018.ticket.enums.EventType;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class EventApprovedDto {
 	EventStatus eventStatus;
 	String eventName;

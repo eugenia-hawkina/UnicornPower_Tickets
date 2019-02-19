@@ -1,5 +1,6 @@
 package telran.ashkelon2018.ticket.controller;
 
+import java.security.Principal;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,20 +21,20 @@ import telran.ashkelon2018.ticket.dto.UpdateEventDto;
 import telran.ashkelon2018.ticket.service.TicketServiceManager;
 
 @RestController
-@RequestMapping("/manager")
+@RequestMapping()
 public class TicketServiceManagerController {
 	
 	@Autowired
 	TicketServiceManager ticketService;
 
-	@PostMapping("/event")
-	public Event addEvent(@RequestBody NewEventDto newEventDto) {
-		return ticketService.addEvent(newEventDto);
+	@PostMapping("/manager/event")
+	public Event addEvent(@RequestBody NewEventDto newEventDto, Principal principal) {
+		return ticketService.addEvent(newEventDto, principal);
 	}
 	
-	@PutMapping("/event")
-	public Event updateEvent(@RequestBody UpdateEventDto updateEventDto) {
-		return ticketService.updateEvent(updateEventDto);
+	@PutMapping("/manager/event")
+	public Event updateEvent(@RequestBody UpdateEventDto updateEventDto, Principal principal) {
+		return ticketService.updateEvent(updateEventDto, principal);
 	}
 	
 	@PutMapping("/event/info")
@@ -42,9 +43,9 @@ public class TicketServiceManagerController {
 	}
 
 	// FIXME // userId from token
-	@GetMapping("/{userId}/events")
-	public Set<Event> receiveUserUpcomingEvents(){
-		return ticketService.receiveUserUpcomingEvents();
+	@GetMapping("/manager/events")
+	public Set<Event> receiveUserUpcomingEvents(Principal principal){
+		return ticketService.receiveUserUpcomingEvents(principal);
 	}	
 	
 	@PostMapping("/events/search")
@@ -52,8 +53,8 @@ public class TicketServiceManagerController {
 		return ticketService.receiveEventList(filter, page, size);
 	}
 	
-	@PutMapping("/event/cancellation")
-	public Event cancelEvent(@RequestBody EventCancellationDto eventCancellation) {
-		return ticketService.cancelEvent(eventCancellation);
+	@PutMapping("/manager/event/cancellation")
+	public Event cancelEvent(@RequestBody EventCancellationDto eventCancellation, Principal principal) {
+		return ticketService.cancelEvent(eventCancellation, principal);
 	}
 }

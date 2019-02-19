@@ -55,7 +55,7 @@ public class TicketServiceOwnerController {
 	}
 	
 	@PutMapping("/event/approve")
-	public EventApprovedDto approveEvent(EventId eventId, Principal principal) {
+	public EventApprovedDto approveEvent(@RequestBody EventId eventId, Principal principal) {
 		return ticketServiceOwner.approveEvent(eventId, principal);
 	}
 	

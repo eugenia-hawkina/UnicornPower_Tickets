@@ -1,20 +1,24 @@
 package telran.ashkelon2018.ticket.service;
 
+import java.security.Principal;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import telran.ashkelon2018.ticket.dao.EventArchivedRepository;
 import telran.ashkelon2018.ticket.dao.EventCancelledRepository;
 import telran.ashkelon2018.ticket.dao.EventRepository;
+import telran.ashkelon2018.ticket.dao.UserAccountRepository;
 import telran.ashkelon2018.ticket.domain.Event;
 import telran.ashkelon2018.ticket.domain.EventCancelled;
 import telran.ashkelon2018.ticket.domain.EventId;
 import telran.ashkelon2018.ticket.domain.Seat;
+import telran.ashkelon2018.ticket.domain.UserAccount;
 import telran.ashkelon2018.ticket.dto.EventCancellationDto;
 import telran.ashkelon2018.ticket.dto.EventListByHallDateDto;
 import telran.ashkelon2018.ticket.dto.NewEventDto;
@@ -22,6 +26,7 @@ import telran.ashkelon2018.ticket.dto.SeatDto;
 import telran.ashkelon2018.ticket.dto.UpdateEventDto;
 import telran.ashkelon2018.ticket.enums.EventStatus;
 import telran.ashkelon2018.ticket.enums.EventType;
+import telran.ashkelon2018.ticket.enums.UserRole;
 import telran.ashkelon2018.ticket.exceptions.BadRequestException;
 import telran.ashkelon2018.ticket.exceptions.EventExistsException;
 import telran.ashkelon2018.ticket.exceptions.NotFoundException;
@@ -37,32 +42,41 @@ public class TicketServiceManagerImpl implements TicketServiceManager {
 	
 	@Autowired
 	EventArchivedRepository archivedEventRepository;
+	
+	@Autowired
+	UserAccountRepository userAccountRepository;
 
 	
 	@Override
-	public Event addEvent(NewEventDto newEventDto) {
-		Event eventCheck = eventRepository.findById(newEventDto.getEventId()).orElse(null);
+	public Event addEvent(NewEventDto newEventDto, Principal principal) {
+		String id = principal.getName();
+		UserAccount manager = userAccountRepository.findById(id).orElse(null);
+		if(!manager.getRoles().contains(UserRole.MANAGER)) {
+			throw new AccessDeniedException("Access denied, you are not a manager");
+		}
+		EventId eventId = newEventDto.getEventId();
+		Event eventCheck = eventRepository.findById(eventId).orElse(null);
 		if(eventCheck != null) {
 			throw new EventExistsException("Sorry, event already exists");
 		}
-		try { 
-			// FIXME - get id from token
-			String userId = "get from token";
-			Set <Seat> seats = convertSeatDtosToSeats(newEventDto.getSeatDto());		
-			Event event = new Event(newEventDto.getEventName(), 
-					newEventDto.getArtist(), newEventDto.getEventId(), newEventDto.getEventDurationMinutes(),
-					seats, newEventDto.getEventType(), newEventDto.getDescription(), 
-					newEventDto.getImages(), userId);
-			eventRepository.save(event);		
-			return event;
-		} catch (Exception e) {
-			e.printStackTrace();
-			throw new BadRequestException("Huston, we have a problem - Bad Request");
-		}
+		String name = newEventDto.getEventName(); 
+		String artist = newEventDto.getArtist();		 
+		int duration = newEventDto.getEventDurationMinutes();
+		Set <Seat> seats = convertSeatDtosToSeats(newEventDto.getSeatDto());
+		EventType eventType = newEventDto.getEventType();
+		String description = newEventDto.getDescription(); 
+		Set<String> images = newEventDto.getImages();
+		if(name == null || artist == null || duration == 0 || images == null) {
+			throw new BadRequestException("More information needed");
+		}				
+		Event event = new Event(name, artist, eventId, duration, seats, eventType, 
+				description, images, id);
+		eventRepository.save(event);		
+		return event;		
 	}
 
 	@Override
-	public Event updateEvent(UpdateEventDto updateEventDto) {
+	public Event updateEvent(UpdateEventDto updateEventDto, Principal principal) {
 		// FIXME - auth
 		Event event = eventRepository.findById(updateEventDto.getEventId()).orElse(null);
 		if(event == null) {
@@ -120,7 +134,7 @@ public class TicketServiceManagerImpl implements TicketServiceManager {
 	}
 
 	@Override
-	public Set<Event> receiveUserUpcomingEvents() {
+	public Set<Event> receiveUserUpcomingEvents(Principal principal) {
 		// TODO Auto-generated method stub - from token
 		return null;
 	}
@@ -161,7 +175,7 @@ public class TicketServiceManagerImpl implements TicketServiceManager {
 	}
 
 	@Override
-	public Event cancelEvent(EventCancellationDto eventCancellation) {
+	public Event cancelEvent(EventCancellationDto eventCancellation, Principal principal) {
 		// FIXME - auth
 		EventId id = eventCancellation.getEventId();
 		Event event = eventRepository.findById(id).orElse(null);

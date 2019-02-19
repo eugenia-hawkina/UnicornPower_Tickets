@@ -25,7 +25,9 @@ import telran.ashkelon2018.ticket.dto.NewHallDto;
 import telran.ashkelon2018.ticket.dto.account.AccountProfileForOwnerDto;
 import telran.ashkelon2018.ticket.dto.account.ManagerAccountProfileDto;
 import telran.ashkelon2018.ticket.enums.EventStatus;
+import telran.ashkelon2018.ticket.enums.EventType;
 import telran.ashkelon2018.ticket.enums.UserRole;
+import telran.ashkelon2018.ticket.exceptions.BadRequestException;
 import telran.ashkelon2018.ticket.exceptions.HallExistsException;
 import telran.ashkelon2018.ticket.exceptions.NotFoundException;
 import telran.ashkelon2018.ticket.exceptions.UserHasNotRightsException;
@@ -134,10 +136,6 @@ public class TicketServiceOwnerImpl implements TicketServiceOwner {
 		}
 		Set<Event> hiddenEvents = new HashSet<>();
 		hiddenEvents.addAll(eventRepository.findByEventStatus(EventStatus.HIDDEN)
-				// FIXME 
-// No converter found capable of converting from type 
-//[telran.ashkelon2018.ticket.domain.SeatId] to type [java.util.Map<?, ?>]
-
 				.collect(Collectors.toSet()));
 		return hiddenEvents;
 	}
@@ -164,9 +162,26 @@ public class TicketServiceOwnerImpl implements TicketServiceOwner {
 		if(!owner.getRoles().contains(UserRole.OWNER)) {
 			throw new AccessDeniedException("Access denied, you are not an onwer");
 		}
-		// TODO Auto-generated method stub
-		
-		return null;
+		Event event = eventRepository.findById(eventId).orElse(null);
+		if(event == null) {
+			throw new BadRequestException("Wrong event id");
+		}		
+		event.setEventStatus(EventStatus.ACTIVE);	
+		eventRepository.save(event);
+		return convertEventToEventApproveDto(event);
+	}
+
+	private EventApprovedDto convertEventToEventApproveDto(Event event) {
+		return EventApprovedDto.builder()
+				.eventStatus(event.getEventStatus())
+				.eventName(event.getEventName())
+				.artist(event.getArtist())
+				.eventId(event.getEventId())
+				.eventDurationMinutes(event.getEventDurationMinutes())
+				.eventType(event.getEventType())
+				.description(event.getDescription())
+				.userId(event.getUserId())
+				.build();
 	}
 
 	@Override
