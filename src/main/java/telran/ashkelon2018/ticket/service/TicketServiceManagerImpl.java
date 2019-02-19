@@ -47,7 +47,7 @@ public class TicketServiceManagerImpl implements TicketServiceManager {
 	UserAccountRepository userAccountRepository;
 
 	
-	@Override
+	@Override 
 	public Event addEvent(NewEventDto newEventDto, Principal principal) {
 		String id = principal.getName();
 		UserAccount manager = userAccountRepository.findById(id).orElse(null);
