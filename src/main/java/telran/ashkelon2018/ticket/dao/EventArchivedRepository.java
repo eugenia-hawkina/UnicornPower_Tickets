@@ -5,7 +5,6 @@ import java.util.stream.Stream;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
 
-import telran.ashkelon2018.ticket.domain.Event;
 import telran.ashkelon2018.ticket.domain.EventArchived;
 import telran.ashkelon2018.ticket.domain.EventId;
 
@@ -15,7 +14,9 @@ public interface EventArchivedRepository extends MongoRepository<EventArchived, 
 	
 	Iterable<EventArchived> findByUserId(String userId);
 	
-	Stream<Event> findByEventIdHallIdAndEventIdEventStartBetween(String hallId, LocalDate from, LocalDate to);
+	Stream<EventArchived> findByEventIdHallIdAndEventIdEventStartBetween(String hallId, LocalDate from, LocalDate to);
 	
-	Stream<Event> findByEventIdEventStartBetween(LocalDate dateFrom, LocalDate dateTo);
+	Stream<EventArchived> findByEventIdEventStartBetween(LocalDate dateFrom, LocalDate dateTo);
+	
+	
 }

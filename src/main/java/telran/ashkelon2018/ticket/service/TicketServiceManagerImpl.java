@@ -14,6 +14,7 @@ import telran.ashkelon2018.ticket.dao.EventCancelledRepository;
 import telran.ashkelon2018.ticket.dao.EventRepository;
 import telran.ashkelon2018.ticket.dao.UserAccountRepository;
 import telran.ashkelon2018.ticket.domain.Event;
+import telran.ashkelon2018.ticket.domain.EventArchived;
 import telran.ashkelon2018.ticket.domain.EventCancelled;
 import telran.ashkelon2018.ticket.domain.EventId;
 import telran.ashkelon2018.ticket.domain.Seat;
@@ -121,7 +122,7 @@ public class TicketServiceManagerImpl implements TicketServiceManager {
 			throw new RuntimeException("Alarm, no seats");
 		}
 		return seatDto.stream()	
-				.map(sd -> new Seat(sd.getSeatId(), sd.getPriceRange(), true, false))
+				.map(sd -> new Seat(sd.getSeatId(), sd.getPriceRange(), true, false, "free"))
 				.collect(Collectors.toSet());	
 	}
 
@@ -144,6 +145,7 @@ public class TicketServiceManagerImpl implements TicketServiceManager {
 	@Override
 	public Set<Event> receiveEventList(EventListByHallDateDto filter, int page, int size) {
 		Set<Event> eventsAll = new HashSet<>();
+		Set<EventArchived> eventsArchivedAll = new HashSet<>();
 		LocalDate dateFrom = filter.getDateFrom();
 		LocalDate dateTo = filter.getDateTo();
 		if(dateFrom == null || dateTo == null) {
@@ -156,11 +158,14 @@ public class TicketServiceManagerImpl implements TicketServiceManager {
 		}
 		String hallId = filter.getHallId();
 		if(dateFrom.isBefore(LocalDate.now()) && dateTo.isBefore(LocalDate.now())) {			
-			eventsAll.addAll(archivedEventRepository
+			eventsArchivedAll.addAll(archivedEventRepository
 					.findByEventIdHallIdAndEventIdEventStartBetween(hallId, dateFrom, dateTo)
 					.skip(size * (page - 1))
 					.limit(size)
 					.collect(Collectors.toSet()));
+			eventsAll = eventsArchivedAll.stream()
+					.map(e -> convertArchivedEventToEvent(e))
+					.collect(Collectors.toSet());
 		}
 		if (dateFrom.isAfter(LocalDate.now()) && dateTo.isAfter(LocalDate.now())) {			
 			eventsAll.addAll(eventRepository
@@ -174,6 +179,22 @@ public class TicketServiceManagerImpl implements TicketServiceManager {
 			throw new BadRequestException("Both dates should be either beforeNow or afterNow");
 		}
 		return eventsAll;
+	}
+
+	private Event convertArchivedEventToEvent(EventArchived e) {
+		return 	Event.builder()
+					.eventStatus(e.getEventStatus())
+					.eventName(e.getEventName())
+					.artist(e.getArtist())
+					.eventId(e.getEventId())
+					.eventDurationMinutes(e.getEventDurationMinutes())
+					.seats(e.getSeats())
+					.eventType(e.getEventType())
+					.description(e.getDescription())
+					.images(e.getImages())
+					.cancellationReason(e.getCancellationReason())
+					.userId(e.getUserId())
+					.build();
 	}
 
 	@Override

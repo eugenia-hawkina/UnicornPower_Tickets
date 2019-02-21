@@ -22,6 +22,7 @@ import telran.ashkelon2018.ticket.domain.EventId;
 import telran.ashkelon2018.ticket.domain.Seat;
 import telran.ashkelon2018.ticket.domain.SeatId;
 import telran.ashkelon2018.ticket.dto.EventListByHallDateDto;
+import telran.ashkelon2018.ticket.dto.TicketPurchaseDto;
 import telran.ashkelon2018.ticket.exceptions.BadRequestException;
 import telran.ashkelon2018.ticket.exceptions.NotFoundException;
 
@@ -66,6 +67,7 @@ public class TicketServiceUserImpl implements TicketServiceUser {
 	@Override
 	public Set<Event> receiveEventsByDate(EventListByHallDateDto filter, int page, int size) {
 		Set<Event> eventsAll = new HashSet<>();
+		Set<EventArchived> eventsArchivedAll = new HashSet<>();
 		LocalDate dateFrom = filter.getDateFrom();
 		LocalDate dateTo = filter.getDateTo();
 		if(dateFrom == null || dateTo == null) {
@@ -77,11 +79,14 @@ public class TicketServiceUserImpl implements TicketServiceUser {
 			dateTo = tmp;
 		}
 		if(dateFrom.isBefore(LocalDate.now()) && dateTo.isBefore(LocalDate.now())) {			
-			eventsAll.addAll(eventArchivedRepository
+			eventsArchivedAll.addAll(eventArchivedRepository
 					.findByEventIdEventStartBetween(dateFrom, dateTo)
 					.skip(size * (page - 1))
 					.limit(size)
 					.collect(Collectors.toSet()));
+			eventsAll = eventsArchivedAll.stream()
+					.map(e -> convertArchivedEventToEvent(e))
+					.collect(Collectors.toSet());		
 		}
 		if (dateFrom.isAfter(LocalDate.now()) && dateTo.isAfter(LocalDate.now())) {			
 			eventsAll.addAll(eventRepository
@@ -94,7 +99,24 @@ public class TicketServiceUserImpl implements TicketServiceUser {
 		if(dateFrom.isBefore(LocalDate.now()) && dateTo.isAfter(LocalDate.now())) {
 			throw new BadRequestException("Both dates should be either beforeNow or afterNow");
 		}	
+		
 		return eventsAll;
+	}
+
+	private Event convertArchivedEventToEvent(EventArchived e) {
+		return 	Event.builder()
+					.eventStatus(e.getEventStatus())
+					.eventName(e.getEventName())
+					.artist(e.getArtist())
+					.eventId(e.getEventId())
+					.eventDurationMinutes(e.getEventDurationMinutes())
+					.seats(e.getSeats())
+					.eventType(e.getEventType())
+					.description(e.getDescription())
+					.images(e.getImages())
+					.cancellationReason(e.getCancellationReason())
+					.userId(e.getUserId())
+					.build();
 	}
 
 	@Override
@@ -122,29 +144,33 @@ public class TicketServiceUserImpl implements TicketServiceUser {
 	
 
 	@Override
-	public Seat buyTicket(EventId eventId, SeatId seatId, String login) {
+	public Set<Seat> buyTicket(TicketPurchaseDto ticketPurchaseDto) {
 		// FIXME=TODO
+		EventId eventId = ticketPurchaseDto.getEventId();
+		String login = ticketPurchaseDto.getLogin();
+		Set<Seat> seats = ticketPurchaseDto.getSeats();
 		Event event = eventRepository.findById(eventId).orElse(null);
 		if(event == null) {
 			throw new BadRequestException("No event found");
 		}
-		
-		
-		Query query = new Query();
-		Criteria criteria = Criteria.where("_id").is(eventId).and("seats._id").is(seatId);
-		query.addCriteria(criteria);
-		Update update = new Update();
-		update.set("description", "Simply Semenovich");
-		event = mongoTemplate.findAndModify(query, update, Event.class);
-		
-		
-
+						
+		Seat[] seatsArr = seats.stream().toArray(s -> new Seat[s]);
+		for (int i = 0; i < seatsArr.length; i++) {
+			Query query = new Query();
+			Criteria criteria = Criteria.where("_id").is(eventId).and("seats").is(seatsArr[i]);
+			query.addCriteria(criteria);
+			Update update = new Update();
+			update.set("seats.$.availability", "false").set("seats.$.buyerInfo", login);
+			event = mongoTemplate.findAndModify(query, update, Event.class);
+		}
+				
 		return null;
 	}
 
 	@Override
 	public Set<Event> receiveVisitedEvents(String login, int page, int size) {
 		// TODO Auto-generated method stub
+		
 		return null;
 	}
 

@@ -2,7 +2,6 @@ package telran.ashkelon2018.ticket.controller;
 
 import java.security.Principal;
 import java.util.Set;
-import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;

@@ -3,3 +3,11 @@ how to find all classes where this class is mentioned? (cross-references)
 find one element everywhere (set Seat -> map)
 
 TODO: delete all events from repository, create new ones, check 500
+
+email to lower case
+
+singleton
+binary tree
+multithreads
+token-auth
+geolocation

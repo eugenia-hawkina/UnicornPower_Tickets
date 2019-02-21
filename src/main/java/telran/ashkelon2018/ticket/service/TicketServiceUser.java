@@ -4,10 +4,10 @@ import java.util.Set;
 
 import telran.ashkelon2018.ticket.domain.Event;
 import telran.ashkelon2018.ticket.domain.EventArchived;
-import telran.ashkelon2018.ticket.domain.EventId;
 import telran.ashkelon2018.ticket.domain.Seat;
 import telran.ashkelon2018.ticket.domain.SeatId;
 import telran.ashkelon2018.ticket.dto.EventListByHallDateDto;
+import telran.ashkelon2018.ticket.dto.TicketPurchaseDto;
 
 public interface TicketServiceUser {
 	
@@ -21,7 +21,7 @@ public interface TicketServiceUser {
 	
 	Set<Event> receiveEventsByArtist(String artist, int page, int size);
 	
-	Seat buyTicket(EventId eventId, SeatId seatId, String login);
+	Set<Seat> buyTicket(TicketPurchaseDto ticketPurchaseDto);
 	
 	
 	// for registered only!!!

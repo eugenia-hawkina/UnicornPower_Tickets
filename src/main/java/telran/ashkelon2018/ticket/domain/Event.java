@@ -6,6 +6,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,6 +22,7 @@ import telran.ashkelon2018.ticket.enums.EventType;
 @ToString
 @EqualsAndHashCode(of = { "eventId" })
 @Document(collection="ticketService_UpcomingEvents")
+@Builder
 public class Event {
 	EventStatus eventStatus;
 	String eventName;
@@ -79,5 +81,20 @@ public class Event {
 		this.userId = eventCancelled.getUserId();
 	}
 	
+	public static Event convertArchivedEventToEvent(EventArchived e) {
+		return 	Event.builder()
+					.eventStatus(e.getEventStatus())
+					.eventName(e.getEventName())
+					.artist(e.getArtist())
+					.eventId(e.getEventId())
+					.eventDurationMinutes(e.getEventDurationMinutes())
+					.seats(e.getSeats())
+					.eventType(e.getEventType())
+					.description(e.getDescription())
+					.images(e.getImages())
+					.cancellationReason(e.getCancellationReason())
+					.userId(e.getUserId())
+					.build();
+	}
 	
 }

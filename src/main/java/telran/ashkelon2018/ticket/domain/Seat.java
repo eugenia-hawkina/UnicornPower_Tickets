@@ -21,18 +21,19 @@ public class Seat {
 	@Id 
 	SeatId seatId;
 	PriceRange priceRange;
-	boolean availability;	// for booking
+	boolean availability;	
 	long bookingTime;
 	boolean paid;
-	BuyerInfo buyerInfo;
+	String buyerInfo;
 	
 	
-	public Seat(SeatId seatId, PriceRange priceRange, boolean availability, boolean paid) {
+	public Seat(SeatId seatId, PriceRange priceRange, boolean availability, boolean paid, String buyerInfo) {
 		this.seatId = seatId;
 		this.priceRange = priceRange;
 		this.availability = true;
 		this.paid = false;
-	} 
-	
+		this.buyerInfo = "free";
+	}
+
 	
 }

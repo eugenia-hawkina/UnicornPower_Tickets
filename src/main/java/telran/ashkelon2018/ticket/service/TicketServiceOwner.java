@@ -2,7 +2,6 @@ package telran.ashkelon2018.ticket.service;
 
 import java.security.Principal;
 import java.util.Set;
-import java.util.stream.Stream;
 
 import telran.ashkelon2018.ticket.domain.Event;
 import telran.ashkelon2018.ticket.domain.EventId;

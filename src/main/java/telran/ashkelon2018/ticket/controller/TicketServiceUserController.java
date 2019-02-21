@@ -19,6 +19,7 @@ import telran.ashkelon2018.ticket.domain.EventId;
 import telran.ashkelon2018.ticket.domain.Seat;
 import telran.ashkelon2018.ticket.domain.SeatId;
 import telran.ashkelon2018.ticket.dto.EventListByHallDateDto;
+import telran.ashkelon2018.ticket.dto.TicketPurchaseDto;
 import telran.ashkelon2018.ticket.service.TicketServiceUser;
 
 @RestController
@@ -55,9 +56,9 @@ public class TicketServiceUserController {
 		return ticketServiceUser.receiveEventsByArtist(artist, page, size);
 	}
 	
-	@PutMapping("event/ticket/purchase")
-	public Seat buyTicket(@RequestBody EventId eventId, SeatId seatId, String login) {
-		return ticketServiceUser.buyTicket(eventId, seatId, login);
+	@PutMapping("/event/ticket/purchase")
+	public Set<Seat> buyTicket(@RequestBody TicketPurchaseDto ticketPurchaseDto) {
+		return ticketServiceUser.buyTicket(ticketPurchaseDto);
 	}
 	
 	
