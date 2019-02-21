@@ -153,9 +153,10 @@ public class TicketServiceUserImpl implements TicketServiceUser {
 		if(event == null) {
 			throw new BadRequestException("No event found");
 		}
-						
+			// FIXME - check seat if available			
 		Seat[] seatsArr = seats.stream().toArray(s -> new Seat[s]);
 		for (int i = 0; i < seatsArr.length; i++) {
+			
 			Query query = new Query();
 			Criteria criteria = Criteria.where("_id").is(eventId).and("seats").is(seatsArr[i]);
 			query.addCriteria(criteria);
