@@ -25,6 +25,8 @@ import telran.ashkelon2018.ticket.dto.EventListByHallDateDto;
 import telran.ashkelon2018.ticket.dto.TicketPurchaseDto;
 import telran.ashkelon2018.ticket.exceptions.BadRequestException;
 import telran.ashkelon2018.ticket.exceptions.NotFoundException;
+import telran.ashkelon2018.ticket.exceptions.SeatNotAvailableException;
+import telran.ashkelon2018.ticket.threads.TaskImplements;
 
 @Service
 public class TicketServiceUserImpl implements TicketServiceUser {
@@ -144,28 +146,46 @@ public class TicketServiceUserImpl implements TicketServiceUser {
 	
 
 	@Override
-	public Set<Seat> buyTicket(TicketPurchaseDto ticketPurchaseDto) {
+	public boolean bookTicket(TicketPurchaseDto ticketPurchaseDto) {
 		// FIXME=TODO
 		EventId eventId = ticketPurchaseDto.getEventId();
 		String login = ticketPurchaseDto.getLogin();
 		Set<Seat> seats = ticketPurchaseDto.getSeats();
 		Event event = eventRepository.findById(eventId).orElse(null);
 		if(event == null) {
-			throw new BadRequestException("No event found");
+			throw new BadRequestException("Event not found");
 		}
-			// FIXME - check seat if available			
+			// check seat if available, change its availability, add buyer		
 		Seat[] seatsArr = seats.stream().toArray(s -> new Seat[s]);
-		for (int i = 0; i < seatsArr.length; i++) {
-			 
+		for (int i = 0; i < seatsArr.length; i++) {			 
 			Query query = new Query();
 			Criteria criteria = Criteria.where("_id").is(eventId).and("seats").is(seatsArr[i]);
 			query.addCriteria(criteria);
 			Update update = new Update();
 			update.set("seats.$.availability", "false").set("seats.$.buyerInfo", login);
 			event = mongoTemplate.findAndModify(query, update, Event.class);
+			
+			// if seat not available -> roll back
+			if(event == null) {				
+				for( int j = 0; j < i; j++) {
+					seatsArr[j].setAvailability(false);
+					seatsArr[j].setBuyerInfo(login);
+					Query query2 = new Query();
+					Criteria criteria2 = Criteria.where("_id").is(eventId).and("seats").is(seatsArr[j]);
+					query2.addCriteria(criteria2);
+					update.set("seats.$.availability", "true").set("seats.$.buyerInfo", "free");
+					event = mongoTemplate.findAndModify(query2, update, Event.class);
+				}
+				throw new SeatNotAvailableException("Seat not available");
+			}
+			
+			// thread sleep 10 min -> roll back // timestamp
+			TaskImplements task = new TaskImplements(seatsArr[i], eventId);
+			Thread thread = new Thread(task);
+			thread.start();
 		}
-				
-		return null;
+		System.out.println("Hello");	
+		return true;
 	}
 
 	@Override

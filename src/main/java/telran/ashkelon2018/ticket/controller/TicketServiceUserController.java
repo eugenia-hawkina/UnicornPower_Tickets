@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import telran.ashkelon2018.ticket.domain.Event;
 import telran.ashkelon2018.ticket.domain.EventArchived;
-import telran.ashkelon2018.ticket.domain.EventId;
 import telran.ashkelon2018.ticket.domain.Seat;
 import telran.ashkelon2018.ticket.domain.SeatId;
 import telran.ashkelon2018.ticket.dto.EventListByHallDateDto;
@@ -56,9 +55,9 @@ public class TicketServiceUserController {
 		return ticketServiceUser.receiveEventsByArtist(artist, page, size);
 	}
 	
-	@PutMapping("/event/ticket/purchase")
-	public Set<Seat> buyTicket(@RequestBody TicketPurchaseDto ticketPurchaseDto) {
-		return ticketServiceUser.buyTicket(ticketPurchaseDto);
+	@PutMapping("/event/ticket/booking")
+	public boolean bookTicket(@RequestBody TicketPurchaseDto ticketPurchaseDto) {
+		return ticketServiceUser.bookTicket(ticketPurchaseDto);
 	}
 	
 	

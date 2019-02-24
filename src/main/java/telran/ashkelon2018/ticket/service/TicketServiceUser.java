@@ -21,7 +21,7 @@ public interface TicketServiceUser {
 	
 	Set<Event> receiveEventsByArtist(String artist, int page, int size);
 	
-	Set<Seat> buyTicket(TicketPurchaseDto ticketPurchaseDto);
+	boolean bookTicket(TicketPurchaseDto ticketPurchaseDto);
 	
 	
 	// for registered only!!!
