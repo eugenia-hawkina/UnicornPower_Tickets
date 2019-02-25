@@ -26,7 +26,6 @@ import telran.ashkelon2018.ticket.dto.TicketPurchaseDto;
 import telran.ashkelon2018.ticket.exceptions.BadRequestException;
 import telran.ashkelon2018.ticket.exceptions.NotFoundException;
 import telran.ashkelon2018.ticket.exceptions.SeatNotAvailableException;
-import telran.ashkelon2018.ticket.threads.TaskImplements;
 
 @Service
 public class TicketServiceUserImpl implements TicketServiceUser {
@@ -144,7 +143,6 @@ public class TicketServiceUserImpl implements TicketServiceUser {
 		return events;
 	}
 	
-
 	@Override
 	public boolean bookTicket(TicketPurchaseDto ticketPurchaseDto) {
 		// FIXME=TODO
@@ -163,6 +161,7 @@ public class TicketServiceUserImpl implements TicketServiceUser {
 			query.addCriteria(criteria);
 			Update update = new Update();
 			update.set("seats.$.availability", "false").set("seats.$.buyerInfo", login);
+//			Event eventCheck = new Event();
 			event = mongoTemplate.findAndModify(query, update, Event.class);
 			
 			// if seat not available -> roll back
@@ -171,27 +170,87 @@ public class TicketServiceUserImpl implements TicketServiceUser {
 					seatsArr[j].setAvailability(false);
 					seatsArr[j].setBuyerInfo(login);
 					Query query2 = new Query();
+					System.out.println(seatsArr[j].toString());
 					Criteria criteria2 = Criteria.where("_id").is(eventId).and("seats").is(seatsArr[j]);
 					query2.addCriteria(criteria2);
 					update.set("seats.$.availability", "true").set("seats.$.buyerInfo", "free");
 					event = mongoTemplate.findAndModify(query2, update, Event.class);
+					System.out.println("find and modify");
 				}
 				throw new SeatNotAvailableException("Seat not available");
+			} else {
+				System.out.println("else");
+			//	event = eventCheck;
 			}
 			
 			// thread sleep 10 min -> roll back // timestamp
-			TaskImplements task = new TaskImplements(seatsArr[i], eventId);
+			TaskImpl task = new TaskImpl(seatsArr[i], eventId, login);
 			Thread thread = new Thread(task);
 			thread.start();
-		}
-		System.out.println("Hello");	
+		}	
 		return true;
 	}
+	
+	private class TaskImpl implements Runnable{
+	 
+		Seat seat;
+		EventId eventId;
+		String login;
+		
+		private TaskImpl(Seat seat, EventId eventId, String login) {
+			this.seat = seat;
+			this.eventId = eventId;
+			this.login = login;
+		}
+		
+		@Override
+		public void run() {
+			try {
+				Thread.sleep(10000);	
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			seat.setAvailability(false);
+			seat.setBuyerInfo(login);
+			Query query2 = new Query();
+			System.out.println(seat.toString());
+			Criteria criteria2 = Criteria.where("_id").is(eventId).and("seats").is(seat);
+			query2.addCriteria(criteria2);
+			Update update = new Update();
+			update.set("seats.$.availability", "true").set("seats.$.buyerInfo", "free");
+						
+			Event event = eventRepository.findById(eventId).orElse(null);
+			event = mongoTemplate.findAndModify(query2, update, Event.class);
 
+//			Query query = new Query();
+//			Criteria criteria = Criteria.where("_id").is(eventId).and("seats").is(seat);
+//			query.addCriteria(criteria);
+//			update.set("seats.$.availability", "true").set("seats.$.buyerInfo", "free");
+//			System.out.println(event.toString());
+//			System.out.println();
+//			event = mongoTemplate.findAndModify(query, update, Event.class);
+//			System.out.println(event.toString());
+		}	
+	}
+
+//	public void cancelTmpBookedTicket(EventId eventId, Seat seat) {
+//		// FIXME - why unused
+//		@SuppressWarnings("unused") 
+//		Event event = eventRepository.findById(eventId).orElse(null);		
+//		Query query = new Query();
+//		Criteria criteria = Criteria.where("_id").is(eventId).and("seats").is(seat);
+//		query.addCriteria(criteria);
+//		Update update = new Update();
+//		update.set("seats.$.availability", "true").set("seats.$.buyerInfo", "free");
+//		System.out.println(event.toString());
+//		System.out.println();
+//		event = mongoTemplate.findAndModify(query, update, Event.class);
+//		System.out.println(event.toString());
+//	}
+	
 	@Override
 	public Set<Event> receiveVisitedEvents(String login, int page, int size) {
 		// TODO Auto-generated method stub
-		
 		return null;
 	}
 
