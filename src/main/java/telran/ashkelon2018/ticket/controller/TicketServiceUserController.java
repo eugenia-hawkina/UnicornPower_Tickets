@@ -17,6 +17,7 @@ import telran.ashkelon2018.ticket.domain.Event;
 import telran.ashkelon2018.ticket.domain.EventArchived;
 import telran.ashkelon2018.ticket.domain.Seat;
 import telran.ashkelon2018.ticket.domain.SeatId;
+import telran.ashkelon2018.ticket.dto.EventListByDateDto;
 import telran.ashkelon2018.ticket.dto.EventListByHallDateDto;
 import telran.ashkelon2018.ticket.dto.TicketPurchaseDto;
 import telran.ashkelon2018.ticket.service.TicketServiceUser;
@@ -40,7 +41,7 @@ public class TicketServiceUserController {
 	}
 	
 	@PostMapping("/events/dates")
-	public Set<Event> receiveEventsByDate(@RequestBody EventListByHallDateDto filter,
+	public Set<Event> receiveEventsByDate(@RequestBody EventListByDateDto filter,
 			@RequestParam int page, @RequestParam int size){
 		return ticketServiceUser.receiveEventsByDate(filter, page, size);
 	}

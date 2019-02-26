@@ -6,7 +6,7 @@ import telran.ashkelon2018.ticket.domain.Event;
 import telran.ashkelon2018.ticket.domain.EventArchived;
 import telran.ashkelon2018.ticket.domain.Seat;
 import telran.ashkelon2018.ticket.domain.SeatId;
-import telran.ashkelon2018.ticket.dto.EventListByHallDateDto;
+import telran.ashkelon2018.ticket.dto.EventListByDateDto;
 import telran.ashkelon2018.ticket.dto.TicketPurchaseDto;
 
 public interface TicketServiceUser {
@@ -15,7 +15,7 @@ public interface TicketServiceUser {
 	
 	Set<EventArchived> receiveArchivedEvents(int page, int size);
 	
-	Set<Event> receiveEventsByDate(EventListByHallDateDto filter, int page, int size);
+	Set<Event> receiveEventsByDate(EventListByDateDto filter, int page, int size);
 	
 	Set<Event> receiveEventsByHall(String hallId, int page, int size);
 	

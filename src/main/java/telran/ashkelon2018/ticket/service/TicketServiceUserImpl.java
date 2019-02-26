@@ -1,6 +1,11 @@
 package telran.ashkelon2018.ticket.service;
 
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -21,8 +26,10 @@ import telran.ashkelon2018.ticket.domain.EventArchived;
 import telran.ashkelon2018.ticket.domain.EventId;
 import telran.ashkelon2018.ticket.domain.Seat;
 import telran.ashkelon2018.ticket.domain.SeatId;
+import telran.ashkelon2018.ticket.dto.EventListByDateDto;
 import telran.ashkelon2018.ticket.dto.EventListByHallDateDto;
 import telran.ashkelon2018.ticket.dto.TicketPurchaseDto;
+import telran.ashkelon2018.ticket.enums.EventStatus;
 import telran.ashkelon2018.ticket.exceptions.BadRequestException;
 import telran.ashkelon2018.ticket.exceptions.NotFoundException;
 import telran.ashkelon2018.ticket.exceptions.SeatNotAvailableException;
@@ -49,6 +56,7 @@ public class TicketServiceUserImpl implements TicketServiceUser {
 	public Set<Event> receiveUpcomingEvents(int page, int size) {
 		Set<Event> upcomingEvents = new HashSet<>();
 		upcomingEvents.addAll(eventRepository.findAllBy()
+			.filter(e -> e.getEventStatus().equals(EventStatus.ACTIVE))
 			.skip(size*(page-1))
 			.limit(size)
 			.collect(Collectors.toSet()));
@@ -66,7 +74,7 @@ public class TicketServiceUserImpl implements TicketServiceUser {
 	}
 
 	@Override
-	public Set<Event> receiveEventsByDate(EventListByHallDateDto filter, int page, int size) {
+	public Set<Event> receiveEventsByDate(EventListByDateDto filter, int page, int size) {
 		Set<Event> eventsAll = new HashSet<>();
 		Set<EventArchived> eventsArchivedAll = new HashSet<>();
 		LocalDate dateFrom = filter.getDateFrom();
@@ -81,7 +89,7 @@ public class TicketServiceUserImpl implements TicketServiceUser {
 		}
 		if(dateFrom.isBefore(LocalDate.now()) && dateTo.isBefore(LocalDate.now())) {			
 			eventsArchivedAll.addAll(eventArchivedRepository
-					.findByEventIdEventStartBetween(dateFrom, dateTo)
+					.findByEventIdEventStartBetween(dateFrom, dateTo)	
 					.skip(size * (page - 1))
 					.limit(size)
 					.collect(Collectors.toSet()));
@@ -91,7 +99,8 @@ public class TicketServiceUserImpl implements TicketServiceUser {
 		}
 		if (dateFrom.isAfter(LocalDate.now()) && dateTo.isAfter(LocalDate.now())) {			
 			eventsAll.addAll(eventRepository
-					.findByEventIdEventStartBetween(dateFrom, dateTo)
+					.findByEventIdEventStartBetween(dateFrom, dateTo)	
+					.filter(e -> e.getEventStatus().equals(EventStatus.ACTIVE))
 					.skip(size * (page - 1))
 					.limit(size)
 					.collect(Collectors.toSet()));
@@ -127,6 +136,7 @@ public class TicketServiceUserImpl implements TicketServiceUser {
 			throw new NotFoundException("Hall not found");
 		}
 		events.addAll(eventRepository.findByEventIdHallId(hallId)
+				.filter(e -> e.getEventStatus().equals(EventStatus.ACTIVE))
 				.skip(size*(page-1))
 				.limit(size)
 				.collect(Collectors.toSet()));		
@@ -137,9 +147,13 @@ public class TicketServiceUserImpl implements TicketServiceUser {
 	public Set<Event> receiveEventsByArtist(String artist, int page, int size) {
 		Set<Event> events = new HashSet<>();
 		events.addAll(eventRepository.findByArtist(artist)
+				.filter(e -> e.getEventStatus().equals(EventStatus.ACTIVE))
 				.skip(size*(page-1))
 				.limit(size)
-				.collect(Collectors.toSet()));		
+				.collect(Collectors.toSet()));	
+		if(events.size() == 0) {
+			throw new NotFoundException("Artist not found");
+		}
 		return events;
 	}
 	
@@ -160,30 +174,27 @@ public class TicketServiceUserImpl implements TicketServiceUser {
 			Criteria criteria = Criteria.where("_id").is(eventId).and("seats").is(seatsArr[i]);
 			query.addCriteria(criteria);
 			Update update = new Update();
-			update.set("seats.$.availability", "false").set("seats.$.buyerInfo", login);
-//			Event eventCheck = new Event();
-			event = mongoTemplate.findAndModify(query, update, Event.class);
+			update.set("seats.$.availability", false).set("seats.$.buyerInfo", login);
+			Event eventCheck = new Event();
+			eventCheck = mongoTemplate.findAndModify(query, update, Event.class);
 			
 			// if seat not available -> roll back
-			if(event == null) {				
+			if(eventCheck == null) {				
 				for( int j = 0; j < i; j++) {
 					seatsArr[j].setAvailability(false);
 					seatsArr[j].setBuyerInfo(login);
 					Query query2 = new Query();
-					System.out.println(seatsArr[j].toString());
 					Criteria criteria2 = Criteria.where("_id").is(eventId).and("seats").is(seatsArr[j]);
 					query2.addCriteria(criteria2);
-					update.set("seats.$.availability", "true").set("seats.$.buyerInfo", "free");
-					event = mongoTemplate.findAndModify(query2, update, Event.class);
-					System.out.println("find and modify");
+					update.set("seats.$.availability", true).set("seats.$.buyerInfo", "free");
+					event  = mongoTemplate.findAndModify(query2, update, Event.class);
 				}
 				throw new SeatNotAvailableException("Seat not available");
-			} else {
-				System.out.println("else");
-			//	event = eventCheck;
-			}
-			
+			} 
+		}
+		
 			// thread sleep 10 min -> roll back // timestamp
+		for(int i = 0; i < seatsArr.length; i++) {		
 			TaskImpl task = new TaskImpl(seatsArr[i], eventId, login);
 			Thread thread = new Thread(task);
 			thread.start();
@@ -206,22 +217,59 @@ public class TicketServiceUserImpl implements TicketServiceUser {
 		@Override
 		public void run() {
 			try {
-				Thread.sleep(10000);	
+				Thread.sleep(30000);	
+				Event event = eventRepository.findById(eventId).orElse(null);
+				seat.setAvailability(false);
+				seat.setBuyerInfo(login);
+				seat.setPaid(false);
+				Query query = new Query();
+				Criteria criteria = Criteria.where("_id").is(eventId).and("seats").is(seat);
+				query.addCriteria(criteria);
+				event = mongoTemplate.findOne(query, Event.class);
+				if (event != null) {
+				// if not paid -> roll back
+					Query queryDel = new Query();
+					Criteria criteriaDel = Criteria.where("_id").is(eventId).and("seats").is(seat);
+					queryDel.addCriteria(criteriaDel);
+					Update updateDel = new Update();
+					updateDel.set("seats.$.availability", true).set("seats.$.buyerInfo", "free");
+					event = mongoTemplate.findAndModify(queryDel, updateDel, Event.class);
+					
+				} else {
+				//if paid -> bookingTime
+					System.out.println("Finish - write time of booking");	
+					seat.setAvailability(false);
+					seat.setBuyerInfo(login);
+					seat.setPaid(true);
+					Query queryUpd = new Query();
+					Criteria criteriaUpd = Criteria.where("_id").is(eventId).and("seats").is(seat);
+					queryUpd.addCriteria(criteriaUpd);
+					Update updateUpd = new Update();
+					LocalDateTime ldt = LocalDateTime.now();	
+					ZonedDateTime zdt = ldt.atZone(ZoneId.of("GMT+03:00"));
+					long time = zdt.toInstant().toEpochMilli();
+					updateUpd.set("seats.$.bookingTime", time);
+					event = mongoTemplate.findAndModify(queryUpd, updateUpd, Event.class);
+					System.out.println(event.toString());
+				}
+				
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-			seat.setAvailability(false);
-			seat.setBuyerInfo(login);
-			Query query2 = new Query();
-			System.out.println(seat.toString());
-			Criteria criteria2 = Criteria.where("_id").is(eventId).and("seats").is(seat);
-			query2.addCriteria(criteria2);
-			Update update = new Update();
-			update.set("seats.$.availability", "true").set("seats.$.buyerInfo", "free");
-						
-			Event event = eventRepository.findById(eventId).orElse(null);
-			event = mongoTemplate.findAndModify(query2, update, Event.class);
-
+		}
+	}
+//			seat.setAvailability(false);
+//			seat.setBuyerInfo(login);
+//			Query query2 = new Query();
+//			System.out.println(seat.toString());
+//			Criteria criteria2 = Criteria.where("_id").is(eventId).and("seats").is(seat);
+//			query2.addCriteria(criteria2);
+//			Update update = new Update();
+//			update.set("seats.$.availability", "true").set("seats.$.buyerInfo", "free");
+//						
+//			Event event = eventRepository.findById(eventId).orElse(null);
+//			event = mongoTemplate.findAndModify(query2, update, Event.class);
+//
 //			Query query = new Query();
 //			Criteria criteria = Criteria.where("_id").is(eventId).and("seats").is(seat);
 //			query.addCriteria(criteria);
@@ -230,8 +278,8 @@ public class TicketServiceUserImpl implements TicketServiceUser {
 //			System.out.println();
 //			event = mongoTemplate.findAndModify(query, update, Event.class);
 //			System.out.println(event.toString());
-		}	
-	}
+//		}	
+//	}
 
 //	public void cancelTmpBookedTicket(EventId eventId, Seat seat) {
 //		// FIXME - why unused
