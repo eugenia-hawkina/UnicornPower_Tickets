@@ -19,6 +19,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter{
 	@Override
 	public void configure(WebSecurity web) {
 		web.ignoring().antMatchers(HttpMethod.POST, "/account/manager/registration");
+		web.ignoring().antMatchers(HttpMethod.POST, "/account/user/registration");
 	}
 
 	@Override
@@ -27,9 +28,12 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter{
 		http.csrf().disable();
 		http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 		 
+		http.authorizeRequests().antMatchers(HttpMethod.PUT, "/account/password").hasRole(UserRole.USER.name());
+		http.authorizeRequests().antMatchers(HttpMethod.PUT, "/account/update").hasRole(UserRole.USER.name());
+		
 		http.authorizeRequests().antMatchers(HttpMethod.GET, "/account/manager").hasRole(UserRole.MANAGER.name());
 		http.authorizeRequests().antMatchers(HttpMethod.PUT, "/account/manager/update").hasRole(UserRole.MANAGER.name());
-		http.authorizeRequests().antMatchers(HttpMethod.PUT, "/account/password").permitAll();
+		
 		// FIXME permit psw change to all users;
 		http.authorizeRequests().antMatchers(HttpMethod.DELETE, "/account/manager/remove").hasRole(UserRole.MANAGER.name());
 		

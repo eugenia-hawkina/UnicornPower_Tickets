@@ -37,6 +37,7 @@ public class UserAccount {
 	Set<String> halls; // hall ids
 	@Singular
 	Set<UserRole> roles;
+	@Singular
 	Set<EventId> visitedEvents;
 	
 	public UserAccount(String login, @NotNull String password) {
@@ -58,7 +59,6 @@ public class UserAccount {
 		this.name = name;
 		this.phone = phone;
 		this.roles = roles;
-		// FIXME
 		this.visitedEvents = new HashSet<EventId>();		
 	}
 	

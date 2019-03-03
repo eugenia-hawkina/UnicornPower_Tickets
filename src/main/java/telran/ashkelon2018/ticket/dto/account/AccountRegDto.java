@@ -1,6 +1,6 @@
 package telran.ashkelon2018.ticket.dto.account;
 
-import java.util.Set;
+import javax.validation.constraints.NotNull;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -8,14 +8,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Getter
 @Setter
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ManagerAccountProfileDto {
-	String login;
+public class AccountRegDto {
+	@NotNull
 	String name;
+	@NotNull
 	String phone;
-	Set<String> halls;
 }

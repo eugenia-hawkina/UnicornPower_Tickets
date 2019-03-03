@@ -1,5 +1,6 @@
 package telran.ashkelon2018.ticket.controller;
 
+import java.security.Principal;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,8 +16,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import telran.ashkelon2018.ticket.domain.Event;
 import telran.ashkelon2018.ticket.domain.EventArchived;
+import telran.ashkelon2018.ticket.domain.EventId;
 import telran.ashkelon2018.ticket.domain.Seat;
-import telran.ashkelon2018.ticket.domain.SeatId;
 import telran.ashkelon2018.ticket.dto.EventListByDateDto;
 import telran.ashkelon2018.ticket.dto.TicketBookingDto;
 import telran.ashkelon2018.ticket.dto.TicketPayDto;
@@ -68,17 +69,17 @@ public class TicketServiceUserController {
 	
 	// for registered only!!!
 	@GetMapping("/events/visited")
-	Set<Event> receiveVisitedEvents(String login, @RequestParam int page, @RequestParam int size){
-		return ticketServiceUser.receiveVisitedEvents(login, page, size);
+	Set<Event> receiveVisitedEvents(Principal principal, @RequestParam int page, @RequestParam int size){
+		return ticketServiceUser.receiveVisitedEvents(principal, page, size);
 	}
 	
-	@GetMapping("/event/ticket/print")
-	Seat printTicket(SeatId seatId, String login) {
-		return ticketServiceUser.printTicket(seatId, login);
+	@GetMapping("/event/tickets/get")
+	Set<Seat> getTickets(@RequestBody EventId eventId, String login) {
+		return ticketServiceUser.getTickets(eventId, login);
 	}
 	
 	@DeleteMapping("/event/ticket/discard")
-	Seat discardTicket(SeatId seatId, String login) {
-		return ticketServiceUser.discardTicket(seatId, login);
+	Set<Seat> discardTickets(@RequestBody EventId eventId, Set<Seat> seats, String login) {
+		return ticketServiceUser.discardTickets(eventId, seats, login);
 	}
 }

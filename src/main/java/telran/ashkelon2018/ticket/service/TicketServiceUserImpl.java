@@ -1,5 +1,7 @@
 package telran.ashkelon2018.ticket.service;
 
+import java.lang.reflect.Array;
+import java.security.Principal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -24,7 +26,6 @@ import telran.ashkelon2018.ticket.domain.Event;
 import telran.ashkelon2018.ticket.domain.EventArchived;
 import telran.ashkelon2018.ticket.domain.EventId;
 import telran.ashkelon2018.ticket.domain.Seat;
-import telran.ashkelon2018.ticket.domain.SeatId;
 import telran.ashkelon2018.ticket.domain.UserAccount;
 import telran.ashkelon2018.ticket.dto.EventListByDateDto;
 import telran.ashkelon2018.ticket.dto.TicketBookingDto;
@@ -262,7 +263,6 @@ public class TicketServiceUserImpl implements TicketServiceUser {
 	
 	@Override
 	public boolean payTicket(TicketPayDto ticketPayDto) {
-		//TODO
 		EventId eventId = ticketPayDto.getEventId();
 		String login = ticketPayDto.getLogin();
 		Set<Seat> seats = ticketPayDto.getSeats();
@@ -296,19 +296,38 @@ public class TicketServiceUserImpl implements TicketServiceUser {
 	}
 	
 	@Override
-	public Set<Event> receiveVisitedEvents(String login, int page, int size) {
-		// TODO login from principal
-		return null;
+	public Set<Event> receiveVisitedEvents(Principal principal, int page, int size) {
+		String id = principal.getName();
+		UserAccount user = userAccountRepository.findById(id).orElse(null);
+		if (user == null) {
+			throw new NotFoundException("User not found");
+		}
+		Set<Event> events = new HashSet<Event>();
+		Set<EventId> eventIds = user.getVisitedEvents();
+		if(eventIds == null) {
+			throw new NotFoundException("User didn't visit any events");
+		}
+		EventId[] arr = eventIds.toArray(new EventId[eventIds.size()]);
+		for (int i = 0; i < eventIds.size(); i++) {
+			System.out.println(arr[i]);
+			if(arr[i].getEventStart().isBefore(LocalDateTime.now())) {
+				EventArchived eventArchived = eventArchivedRepository.findById(arr[i]).orElse(null);
+				events.add(convertArchivedEventToEvent(eventArchived));
+			} else {
+				events.add(eventRepository.findById(arr[i]).orElse(null));
+			}
+		}
+		return events;
 	}
 
 	@Override
-	public Seat printTicket(SeatId seatId, String login) {
+	public Set<Seat> getTickets(EventId eventId, String login) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Seat discardTicket(SeatId seatId, String login) {
+	public Set<Seat> discardTickets(EventId eventId, Set<Seat> seats, String login) {
 		// TODO Auto-generated method stub
 		return null;
 	}

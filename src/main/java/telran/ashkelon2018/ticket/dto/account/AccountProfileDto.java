@@ -1,21 +1,23 @@
 package telran.ashkelon2018.ticket.dto.account;
 
-import javax.validation.constraints.NotNull;
+import java.util.Set;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import telran.ashkelon2018.ticket.domain.EventId;
 
-@Setter
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ManagerRegDto {
-	@NotNull
+public class AccountProfileDto {
+	String login;
 	String name;
-	@NotNull
 	String phone;
+	Set<String> halls;	
+	Set <EventId> visitedEvents;
 }

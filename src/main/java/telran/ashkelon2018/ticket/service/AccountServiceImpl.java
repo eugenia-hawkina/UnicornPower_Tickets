@@ -11,13 +11,13 @@ import telran.ashkelon2018.ticket.configuration.AccountCredentials;
 import telran.ashkelon2018.ticket.dao.UserAccountRepository;
 import telran.ashkelon2018.ticket.domain.EventId;
 import telran.ashkelon2018.ticket.domain.UserAccount;
-import telran.ashkelon2018.ticket.dto.account.ManagerAccountProfileDto;
-import telran.ashkelon2018.ticket.dto.account.ManagerRegDto;
+import telran.ashkelon2018.ticket.dto.account.AccountProfileDto;
+import telran.ashkelon2018.ticket.dto.account.AccountRegDto;
 import telran.ashkelon2018.ticket.enums.UserRole;
 import telran.ashkelon2018.ticket.exceptions.UserExistsException;
 
 @Service
-public class AccountManagerServiceImpl implements AccountManagerService {
+public class AccountServiceImpl implements AccountService {
 
 	@Autowired
 	UserAccountRepository repository;
@@ -29,7 +29,7 @@ public class AccountManagerServiceImpl implements AccountManagerService {
 	AccountConfiguration accountConfiguration;
 
 	@Override
-	public ManagerAccountProfileDto addManager(ManagerRegDto managerRegDto, String token) {
+	public AccountProfileDto addManager(AccountRegDto managerRegDto, String token) {
 		AccountCredentials credentials = accountConfiguration.tokenDecode(token);
 		if (repository.existsById(credentials.getLogin())) {
 			throw new UserExistsException("User already exists");
@@ -45,38 +45,53 @@ public class AccountManagerServiceImpl implements AccountManagerService {
 				.visitedEvents(new HashSet<EventId>())
 				.build();  
 		repository.save(manager);
-		return convertToManagerAccountProfileDto(manager);
+		return convertToAccountProfileDto(manager);
 	}
 
-	private ManagerAccountProfileDto convertToManagerAccountProfileDto(UserAccount manager) {
-		return ManagerAccountProfileDto.builder().login(manager.getLogin()).name(manager.getName())
-				.phone(manager.getPhone()).halls(manager.getHalls()).build();
+	private AccountProfileDto convertToAccountProfileDto(UserAccount manager) {
+		return AccountProfileDto.builder()
+				.login(manager.getLogin())
+				.name(manager.getName())
+				.phone(manager.getPhone())
+				.halls(manager.getHalls())
+				.visitedEvents(manager.getVisitedEvents())
+				.build();
 	}
 
 	@Override
-	public ManagerAccountProfileDto loginManager(String token) {
+	public AccountProfileDto loginAccount(String token) {
 		AccountCredentials credentials = accountConfiguration.tokenDecode(token);
 		UserAccount userAccount = repository.findById(credentials.getLogin()).get();
-		return convertToManagerAccountProfileDto(userAccount);
+		return convertToUniversalAccountProfileDto(userAccount);
+	}
+
+	private AccountProfileDto convertToUniversalAccountProfileDto(UserAccount userAccount) {
+		return AccountProfileDto.builder()
+				.login(userAccount.getLogin())
+				.name(userAccount.getName())
+				.phone(userAccount.getPhone())
+				.halls(userAccount.getHalls())
+				.visitedEvents(userAccount.getVisitedEvents())
+				.build();
 	}
 
 	@Override
-	public ManagerAccountProfileDto editManager(ManagerRegDto managerRegDto, String token) {
+	public AccountProfileDto editManager(AccountRegDto managerRegDto, String token) {
 		AccountCredentials credentials = accountConfiguration.tokenDecode(token);
 		UserAccount userAccount = repository.findById(credentials.getLogin()).get();
 		userAccount.setName(managerRegDto.getName());
 		userAccount.setPhone(managerRegDto.getPhone());
 		repository.save(userAccount);
-		return convertToManagerAccountProfileDto(userAccount);
+		return convertToAccountProfileDto(userAccount);
 
 	}
 
 	@Override
-	public ManagerAccountProfileDto removeManager(String token) {
+	public AccountProfileDto removeManager(String token) {
 		AccountCredentials credentials = accountConfiguration.tokenDecode(token);
 		UserAccount userAccount = repository.findById(credentials.getLogin()).get();
 		repository.delete(userAccount);
-		return convertToManagerAccountProfileDto(userAccount);
+		return convertToAccountProfileDto(userAccount);
 	}
 
 	@Override
@@ -94,14 +109,24 @@ public class AccountManagerServiceImpl implements AccountManagerService {
 		}
 	}
 
-//	@Override
-//	public Set<String> addHall(String login, String hallId, String token) {	
-//		return null;
-//	}
-//
-//	@Override
-//	public Set<String> removeHall(String login, String hallId, String token) {		
-//		return null;
-//	}
+	@Override
+	public AccountProfileDto addUser(AccountRegDto accountRegDto, String token) {
+		AccountCredentials credentials = accountConfiguration.tokenDecode(token);
+		if (repository.existsById(credentials.getLogin())) {
+			throw new UserExistsException("User already exists");
+		}
+		String hashPassword = encoder.encode(credentials.getPassword());
+		UserAccount user = UserAccount.builder()
+				.login(credentials.getLogin())
+				.password(hashPassword)
+				.name(accountRegDto.getName())
+				.phone(accountRegDto.getPhone())
+				.role(UserRole.USER)
+				.visitedEvents(new HashSet<EventId>())
+				.halls(new HashSet<String>())
+				.build();  
+		repository.save(user);
+		return convertToAccountProfileDto(user);
+	}
 
 }

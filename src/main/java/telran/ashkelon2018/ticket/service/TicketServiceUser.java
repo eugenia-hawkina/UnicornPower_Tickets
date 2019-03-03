@@ -1,11 +1,12 @@
 package telran.ashkelon2018.ticket.service;
 
+import java.security.Principal;
 import java.util.Set;
 
 import telran.ashkelon2018.ticket.domain.Event;
 import telran.ashkelon2018.ticket.domain.EventArchived;
+import telran.ashkelon2018.ticket.domain.EventId;
 import telran.ashkelon2018.ticket.domain.Seat;
-import telran.ashkelon2018.ticket.domain.SeatId;
 import telran.ashkelon2018.ticket.dto.EventListByDateDto;
 import telran.ashkelon2018.ticket.dto.TicketBookingDto;
 import telran.ashkelon2018.ticket.dto.TicketPayDto;
@@ -28,10 +29,11 @@ public interface TicketServiceUser {
 	
 	
 	// for registered only!!!
-	Set<Event> receiveVisitedEvents(String login, int page, int size);	
+		
+	Set<Event> receiveVisitedEvents(Principal principal, int page, int size);	
 	
-	Seat printTicket(SeatId seatId, String login);
+	Set<Seat> getTickets(EventId eventId, String login);
 	
-	Seat discardTicket(SeatId seatId, String login);
+	Set<Seat> discardTickets(EventId eventId, Set<Seat> seats, String login);
 
 }
