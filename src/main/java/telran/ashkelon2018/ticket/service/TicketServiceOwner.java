@@ -21,6 +21,8 @@ public interface TicketServiceOwner {
 	
 	ManagerAccountProfileDto addHallToManager(String login, String hallId, Principal principal);
 	
+	AccountProfileForOwnerDto addManagerRole(String login, Principal principal);
+	
 	AccountProfileForOwnerDto removeManagerRole(String login, Principal principal);
 	
 	Set<Event> receiveHiddenEvents(Principal principal);

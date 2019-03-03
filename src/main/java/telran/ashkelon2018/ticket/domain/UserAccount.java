@@ -1,5 +1,6 @@
 package telran.ashkelon2018.ticket.domain;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import javax.validation.constraints.NotNull;
@@ -36,7 +37,7 @@ public class UserAccount {
 	Set<String> halls; // hall ids
 	@Singular
 	Set<UserRole> roles;
-	Set <EventId> visitedEvents;
+	Set<EventId> visitedEvents;
 	
 	public UserAccount(String login, @NotNull String password) {
 		this.login = login;
@@ -50,12 +51,15 @@ public class UserAccount {
 		this.phone = phone;
 	}
 	
-	public UserAccount(String login, @NotNull String password, String name, String phone, Set<UserRole> roles) {
+	public UserAccount(String login, @NotNull String password, String name, String phone, 
+			Set<UserRole> roles) {
 		this.login = login;
 		this.password = password;
 		this.name = name;
 		this.phone = phone;
 		this.roles = roles;
+		// FIXME
+		this.visitedEvents = new HashSet<EventId>();		
 	}
 	
 	public void addHall(String hallId) {
@@ -74,8 +78,8 @@ public class UserAccount {
 		roles.remove(role);
 	}
 	
-	public void addVisitedEvent(EventId event) {
-		visitedEvents.add(event);
+	public void addVisitedEvent(EventId eventId) {
+		visitedEvents.add(eventId);
 	}
 	
 	public void removeVisitedEvent(EventId event) {

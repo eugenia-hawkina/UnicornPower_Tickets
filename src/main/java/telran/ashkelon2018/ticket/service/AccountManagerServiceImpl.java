@@ -1,5 +1,7 @@
 package telran.ashkelon2018.ticket.service;
 
+import java.util.HashSet;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -7,6 +9,7 @@ import org.springframework.stereotype.Service;
 import telran.ashkelon2018.ticket.configuration.AccountConfiguration;
 import telran.ashkelon2018.ticket.configuration.AccountCredentials;
 import telran.ashkelon2018.ticket.dao.UserAccountRepository;
+import telran.ashkelon2018.ticket.domain.EventId;
 import telran.ashkelon2018.ticket.domain.UserAccount;
 import telran.ashkelon2018.ticket.dto.account.ManagerAccountProfileDto;
 import telran.ashkelon2018.ticket.dto.account.ManagerRegDto;
@@ -39,6 +42,7 @@ public class AccountManagerServiceImpl implements AccountManagerService {
 				.phone(managerRegDto.getPhone())
 				.role(UserRole.MANAGER)
 				.role(UserRole.USER)
+				.visitedEvents(new HashSet<EventId>())
 				.build();  
 		repository.save(manager);
 		return convertToManagerAccountProfileDto(manager);

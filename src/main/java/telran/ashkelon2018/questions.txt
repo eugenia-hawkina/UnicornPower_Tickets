@@ -4,6 +4,8 @@ find one element everywhere (set Seat -> map)
 
 TODO: delete all events from repository, create new ones, check 500
 
+bookTicket UserSErviceImpl - thread 10 min
+
 email to lower case
 
 singleton

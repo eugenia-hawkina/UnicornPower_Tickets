@@ -1,7 +1,5 @@
 package telran.ashkelon2018.ticket.service;
 
-import java.sql.Timestamp;
-import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -21,14 +19,16 @@ import telran.ashkelon2018.ticket.dao.EventArchivedRepository;
 import telran.ashkelon2018.ticket.dao.EventCancelledRepository;
 import telran.ashkelon2018.ticket.dao.EventRepository;
 import telran.ashkelon2018.ticket.dao.HallRepository;
+import telran.ashkelon2018.ticket.dao.UserAccountRepository;
 import telran.ashkelon2018.ticket.domain.Event;
 import telran.ashkelon2018.ticket.domain.EventArchived;
 import telran.ashkelon2018.ticket.domain.EventId;
 import telran.ashkelon2018.ticket.domain.Seat;
 import telran.ashkelon2018.ticket.domain.SeatId;
+import telran.ashkelon2018.ticket.domain.UserAccount;
 import telran.ashkelon2018.ticket.dto.EventListByDateDto;
-import telran.ashkelon2018.ticket.dto.EventListByHallDateDto;
-import telran.ashkelon2018.ticket.dto.TicketPurchaseDto;
+import telran.ashkelon2018.ticket.dto.TicketBookingDto;
+import telran.ashkelon2018.ticket.dto.TicketPayDto;
 import telran.ashkelon2018.ticket.enums.EventStatus;
 import telran.ashkelon2018.ticket.exceptions.BadRequestException;
 import telran.ashkelon2018.ticket.exceptions.NotFoundException;
@@ -45,6 +45,9 @@ public class TicketServiceUserImpl implements TicketServiceUser {
 	
 	@Autowired
 	EventArchivedRepository eventArchivedRepository;
+	
+	@Autowired
+	UserAccountRepository userAccountRepository;
 	
 	@Autowired
 	HallRepository hallRepository;
@@ -158,8 +161,7 @@ public class TicketServiceUserImpl implements TicketServiceUser {
 	}
 	
 	@Override
-	public boolean bookTicket(TicketPurchaseDto ticketPurchaseDto) {
-		// FIXME=TODO
+	public boolean bookTicket(TicketBookingDto ticketPurchaseDto) {
 		EventId eventId = ticketPurchaseDto.getEventId();
 		String login = ticketPurchaseDto.getLogin();
 		Set<Seat> seats = ticketPurchaseDto.getSeats();
@@ -198,7 +200,7 @@ public class TicketServiceUserImpl implements TicketServiceUser {
 			TaskImpl task = new TaskImpl(seatsArr[i], eventId, login);
 			Thread thread = new Thread(task);
 			thread.start();
-		}	
+		}
 		return true;
 	}
 	
@@ -236,8 +238,7 @@ public class TicketServiceUserImpl implements TicketServiceUser {
 					event = mongoTemplate.findAndModify(queryDel, updateDel, Event.class);
 					
 				} else {
-				//if paid -> bookingTime
-					System.out.println("Finish - write time of booking");	
+				//if paid -> add bookingTime				
 					seat.setAvailability(false);
 					seat.setBuyerInfo(login);
 					seat.setPaid(true);
@@ -258,47 +259,45 @@ public class TicketServiceUserImpl implements TicketServiceUser {
 			}
 		}
 	}
-//			seat.setAvailability(false);
-//			seat.setBuyerInfo(login);
-//			Query query2 = new Query();
-//			System.out.println(seat.toString());
-//			Criteria criteria2 = Criteria.where("_id").is(eventId).and("seats").is(seat);
-//			query2.addCriteria(criteria2);
-//			Update update = new Update();
-//			update.set("seats.$.availability", "true").set("seats.$.buyerInfo", "free");
-//						
-//			Event event = eventRepository.findById(eventId).orElse(null);
-//			event = mongoTemplate.findAndModify(query2, update, Event.class);
-//
-//			Query query = new Query();
-//			Criteria criteria = Criteria.where("_id").is(eventId).and("seats").is(seat);
-//			query.addCriteria(criteria);
-//			update.set("seats.$.availability", "true").set("seats.$.buyerInfo", "free");
-//			System.out.println(event.toString());
-//			System.out.println();
-//			event = mongoTemplate.findAndModify(query, update, Event.class);
-//			System.out.println(event.toString());
-//		}	
-//	}
-
-//	public void cancelTmpBookedTicket(EventId eventId, Seat seat) {
-//		// FIXME - why unused
-//		@SuppressWarnings("unused") 
-//		Event event = eventRepository.findById(eventId).orElse(null);		
-//		Query query = new Query();
-//		Criteria criteria = Criteria.where("_id").is(eventId).and("seats").is(seat);
-//		query.addCriteria(criteria);
-//		Update update = new Update();
-//		update.set("seats.$.availability", "true").set("seats.$.buyerInfo", "free");
-//		System.out.println(event.toString());
-//		System.out.println();
-//		event = mongoTemplate.findAndModify(query, update, Event.class);
-//		System.out.println(event.toString());
-//	}
+	
+	@Override
+	public boolean payTicket(TicketPayDto ticketPayDto) {
+		//TODO
+		EventId eventId = ticketPayDto.getEventId();
+		String login = ticketPayDto.getLogin();
+		Set<Seat> seats = ticketPayDto.getSeats();
+		boolean paid = ticketPayDto.isPaid();
+		if(!paid) {
+			return false;
+		}
+		Event event = eventRepository.findById(eventId).orElse(null);
+		if(event == null) {
+			throw new BadRequestException("Event not found");
+		}		
+		Seat[] seatsArr = seats.stream().toArray(s -> new Seat[s]);
+		for (int i = 0; i < seatsArr.length; i++) {			 
+			Query query = new Query();
+			Criteria criteria = Criteria.where("_id").is(eventId).and("seats").is(seatsArr[i]);
+			query.addCriteria(criteria);
+			Update update = new Update();
+			update.set("seats.$.paid", true);			
+			Event eventCheck = mongoTemplate.findAndModify(query, update, Event.class);
+			if(eventCheck == null) {
+				throw new BadRequestException("Can't update event");
+			}
+		}
+		UserAccount user = userAccountRepository.findById(login).orElse(null);
+		if(user == null) {
+			return true;
+		}
+		user.addVisitedEvent(eventId);
+		userAccountRepository.save(user);	
+		return true;
+	}
 	
 	@Override
 	public Set<Event> receiveVisitedEvents(String login, int page, int size) {
-		// TODO Auto-generated method stub
+		// TODO login from principal
 		return null;
 	}
 

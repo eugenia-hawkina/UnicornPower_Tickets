@@ -126,6 +126,23 @@ public class TicketServiceOwnerImpl implements TicketServiceOwner {
 	}
 
 	@Override
+	public AccountProfileForOwnerDto addManagerRole(String login, Principal principal) {
+		String id = principal.getName();
+		UserAccount owner = userAccountRepository.findById(id).orElse(null);
+		if(!owner.getRoles().contains(UserRole.OWNER)) {
+			throw new AccessDeniedException("Access denied, you are not an onwer");
+		}
+		if (!userAccountRepository.existsById(login)) {
+			throw new NotFoundException("No such user");
+		}
+		UserAccount userAccount = userAccountRepository.findById(login).get();
+		userAccount.addRole(UserRole.MANAGER);
+		userAccountRepository.save(userAccount);
+		return convertToAccountProfileForOwnerDto(userAccount);
+	}	
+	
+	
+	@Override
 	public Set<Event> receiveHiddenEvents(Principal principal) {
 		// without pagination
 		String id = principal.getName();

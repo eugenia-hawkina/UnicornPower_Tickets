@@ -18,8 +18,8 @@ import telran.ashkelon2018.ticket.domain.EventArchived;
 import telran.ashkelon2018.ticket.domain.Seat;
 import telran.ashkelon2018.ticket.domain.SeatId;
 import telran.ashkelon2018.ticket.dto.EventListByDateDto;
-import telran.ashkelon2018.ticket.dto.EventListByHallDateDto;
-import telran.ashkelon2018.ticket.dto.TicketPurchaseDto;
+import telran.ashkelon2018.ticket.dto.TicketBookingDto;
+import telran.ashkelon2018.ticket.dto.TicketPayDto;
 import telran.ashkelon2018.ticket.service.TicketServiceUser;
 
 @RestController
@@ -57,10 +57,14 @@ public class TicketServiceUserController {
 	}
 	
 	@PutMapping("/event/ticket/booking")
-	public boolean bookTicket(@RequestBody TicketPurchaseDto ticketPurchaseDto) {
+	public boolean bookTicket(@RequestBody TicketBookingDto ticketPurchaseDto) {
 		return ticketServiceUser.bookTicket(ticketPurchaseDto);
 	}
 	
+	@PutMapping("/event/ticket/pay")
+	public boolean payTicket(@RequestBody TicketPayDto ticketPayDto) {
+		return ticketServiceUser.payTicket(ticketPayDto);
+	}
 	
 	// for registered only!!!
 	@GetMapping("/events/visited")

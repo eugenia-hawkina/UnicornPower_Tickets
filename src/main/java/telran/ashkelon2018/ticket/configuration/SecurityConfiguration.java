@@ -30,7 +30,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter{
 		http.authorizeRequests().antMatchers(HttpMethod.GET, "/account/manager").hasRole(UserRole.MANAGER.name());
 		http.authorizeRequests().antMatchers(HttpMethod.PUT, "/account/manager/update").hasRole(UserRole.MANAGER.name());
 		http.authorizeRequests().antMatchers(HttpMethod.PUT, "/account/password").permitAll();
-		// FIXME permit psw change to all users;; hasAnyRole() - doesn't work
+		// FIXME permit psw change to all users;
 		http.authorizeRequests().antMatchers(HttpMethod.DELETE, "/account/manager/remove").hasRole(UserRole.MANAGER.name());
 		
 		http.authorizeRequests().antMatchers("/owner/**").hasRole(UserRole.OWNER.name());

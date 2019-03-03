@@ -7,7 +7,8 @@ import telran.ashkelon2018.ticket.domain.EventArchived;
 import telran.ashkelon2018.ticket.domain.Seat;
 import telran.ashkelon2018.ticket.domain.SeatId;
 import telran.ashkelon2018.ticket.dto.EventListByDateDto;
-import telran.ashkelon2018.ticket.dto.TicketPurchaseDto;
+import telran.ashkelon2018.ticket.dto.TicketBookingDto;
+import telran.ashkelon2018.ticket.dto.TicketPayDto;
 
 public interface TicketServiceUser {
 	
@@ -21,7 +22,9 @@ public interface TicketServiceUser {
 	
 	Set<Event> receiveEventsByArtist(String artist, int page, int size);
 	
-	boolean bookTicket(TicketPurchaseDto ticketPurchaseDto);
+	boolean bookTicket(TicketBookingDto ticketPurchaseDto);
+	
+	boolean payTicket(TicketPayDto ticketPayDto);
 	
 	
 	// for registered only!!!

@@ -43,6 +43,11 @@ public class TicketServiceOwnerController {
 		return ticketServiceOwner.addHallToManager(login, hallId, principal);
 	}
 	
+	@PutMapping("/roles/{login}")
+	public AccountProfileForOwnerDto addManagerRole(@PathVariable String login, Principal principal) {
+		return ticketServiceOwner.addManagerRole(login, principal);
+	}
+	
 	@DeleteMapping("/roles/{login}")
 	public AccountProfileForOwnerDto removeManagerRole(@PathVariable String login, Principal principal) {
 		return ticketServiceOwner.removeManagerRole(login, principal);

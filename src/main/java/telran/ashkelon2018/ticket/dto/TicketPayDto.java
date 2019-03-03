@@ -13,9 +13,10 @@ import telran.ashkelon2018.ticket.domain.Seat;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class TicketPurchaseDto {
-
+public class TicketPayDto {
 	EventId eventId;
 	Set <Seat> seats;
 	String login;
+	boolean paid;
+
 }
