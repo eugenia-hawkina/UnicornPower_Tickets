@@ -1,6 +1,5 @@
 package telran.ashkelon2018.ticket.service;
 
-import java.lang.reflect.Array;
 import java.security.Principal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -28,6 +27,7 @@ import telran.ashkelon2018.ticket.domain.EventId;
 import telran.ashkelon2018.ticket.domain.Seat;
 import telran.ashkelon2018.ticket.domain.UserAccount;
 import telran.ashkelon2018.ticket.dto.EventListByDateDto;
+import telran.ashkelon2018.ticket.dto.EventListByHallDateDto;
 import telran.ashkelon2018.ticket.dto.TicketBookingDto;
 import telran.ashkelon2018.ticket.dto.TicketPayDto;
 import telran.ashkelon2018.ticket.enums.EventStatus;
@@ -270,21 +270,15 @@ public class TicketServiceUserImpl implements TicketServiceUser {
 		if(!paid) {
 			return false;
 		}
-		Event event = eventRepository.findById(eventId).orElse(null);
-		if(event == null) {
-			throw new BadRequestException("Event not found");
-		}		
+		eventRepository.findById(eventId).orElse(null);
 		Seat[] seatsArr = seats.stream().toArray(s -> new Seat[s]);
 		for (int i = 0; i < seatsArr.length; i++) {			 
 			Query query = new Query();
 			Criteria criteria = Criteria.where("_id").is(eventId).and("seats").is(seatsArr[i]);
 			query.addCriteria(criteria);
 			Update update = new Update();
-			update.set("seats.$.paid", true);			
-			Event eventCheck = mongoTemplate.findAndModify(query, update, Event.class);
-			if(eventCheck == null) {
-				throw new BadRequestException("Can't update event");
-			}
+			update.set("seats.$.paid", true);	
+			mongoTemplate.findAndModify(query, update, Event.class);
 		}
 		UserAccount user = userAccountRepository.findById(login).orElse(null);
 		if(user == null) {
@@ -321,15 +315,81 @@ public class TicketServiceUserImpl implements TicketServiceUser {
 	}
 
 	@Override
-	public Set<Seat> getTickets(EventId eventId, String login) {
-		// TODO Auto-generated method stub
-		return null;
+	public Set<Seat> getTickets(EventId eventId, Principal principal) {
+		String login = principal.getName();
+		UserAccount user = userAccountRepository.findById(login).orElse(null);
+		Set<EventId> eventIds = user.getVisitedEvents();
+		if(!eventIds.contains(eventId)) {
+			throw new NotFoundException("User didn't visit this event"); 
+		}
+		Event event = new Event();
+		if(eventId.getEventStart().isBefore(LocalDateTime.now())) {
+			event = convertArchivedEventToEvent(eventArchivedRepository.findById(eventId).orElse(null));
+		} else {
+			event = eventRepository.findById(eventId).orElse(null);
+		}
+		Set<Seat> seats = event.getSeats().stream()
+				.filter(s -> s.getBuyerInfo().equals(login))
+				.collect(Collectors.toSet());
+		if(seats.size() == 0) {
+			throw new NotFoundException("User didn't visit this event");
+		}
+		return seats;
 	}
 
 	@Override
-	public Set<Seat> discardTickets(EventId eventId, Set<Seat> seats, String login) {
-		// TODO Auto-generated method stub
-		return null;
+	public Event receiveEventInfo(EventId eventId) {
+		Event event = eventRepository.findById(eventId).orElse(null);
+		if(event == null) {
+			throw new NotFoundException("Event not found");
+		}
+		return event;
+	}
+ 
+//	@Override
+//	public Set<Seat> discardTickets(EventId eventId, Set<Seat> seats, String login) {
+//		// Auto-generated method stub
+//		return null;
+//	}
+
+	@Override
+	public Set<Event> receiveEventsByHallAndDate(EventListByHallDateDto filter, int page, int size) {
+		Set<Event> eventsAll = new HashSet<>();
+		Set<EventArchived> eventsArchivedAll = new HashSet<>();
+		LocalDate dateFrom = filter.getDateFrom();
+		LocalDate dateTo = filter.getDateTo();
+		if(dateFrom == null || dateTo == null) {
+			throw new BadRequestException("I need two dates");
+		}
+		if(dateTo.isBefore(dateFrom)) {
+			LocalDate tmp = dateFrom;
+			dateFrom = dateTo;
+			dateTo = tmp;
+		}
+		String hallId = filter.getHallId();
+		if(dateFrom.isBefore(LocalDate.now()) && dateTo.isBefore(LocalDate.now())) {			
+			eventsArchivedAll.addAll(eventArchivedRepository
+					.findByEventIdHallIdAndEventIdEventStartBetween(hallId, dateFrom, dateTo)
+					.skip(size * (page - 1))
+					.limit(size)
+					.collect(Collectors.toSet()));
+			eventsAll = eventsArchivedAll.stream()
+					.map(e -> convertArchivedEventToEvent(e))
+					.collect(Collectors.toSet());
+		}
+		if (dateFrom.isAfter(LocalDate.now()) && dateTo.isAfter(LocalDate.now())) {			
+			eventsAll.addAll(eventRepository
+					.findByEventIdHallIdAndEventIdEventStartBetween(hallId, dateFrom, dateTo)
+					.filter(e -> e.getEventStatus().equals(EventStatus.ACTIVE))
+					.skip(size * (page - 1))
+					.limit(size)
+					.collect(Collectors.toSet()));
+		}
+		// FIXME combine info from two repositories
+		if(dateFrom.isBefore(LocalDate.now()) && dateTo.isAfter(LocalDate.now())) {
+			throw new BadRequestException("Both dates should be either beforeNow or afterNow");
+		}
+		return eventsAll;
 	}
 
 }

@@ -44,9 +44,9 @@ public class AccountServiceController {
 		return accountService.editManager(managerRegDto, token);
 	}
 
-	@DeleteMapping("/manager/remove")
-	public AccountProfileDto removeManager(@RequestHeader("Authorization") String token) {
-		return accountService.removeManager(token);
+	@DeleteMapping("/user/remove")
+	public AccountProfileDto removeUser(@RequestHeader("Authorization") String token) {
+		return accountService.removeUser(token);
 	}
 		
 	@PutMapping("/password")

@@ -4,6 +4,7 @@ import java.security.Principal;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -16,15 +17,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import telran.ashkelon2018.ticket.domain.Event;
 import telran.ashkelon2018.ticket.domain.EventId;
-import telran.ashkelon2018.ticket.domain.Seat;
-import telran.ashkelon2018.ticket.domain.SeatId;
 import telran.ashkelon2018.ticket.dto.EventApprovedDto;
 import telran.ashkelon2018.ticket.dto.NewHallDto;
 import telran.ashkelon2018.ticket.dto.account.AccountProfileForOwnerDto;
 import telran.ashkelon2018.ticket.dto.account.ManagerAccountProfileDto;
 import telran.ashkelon2018.ticket.service.TicketServiceOwner;
 
-// FIXME @CrossOrigin(origins = "*", allowedHeaders = "*")
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController
 @RequestMapping("/owner")
 public class TicketServiceOwnerController {
@@ -42,7 +41,12 @@ public class TicketServiceOwnerController {
 			@PathVariable String hallId, Principal principal) {
 		return ticketServiceOwner.addHallToManager(login, hallId, principal);
 	}
-	
+
+	@DeleteMapping("/{login}/hall/{hallId}")
+	public ManagerAccountProfileDto removeHallFromManager(@PathVariable String login, 
+			@PathVariable String hallId, Principal principal) {
+		return ticketServiceOwner.removeHallFromManager(login, hallId, principal);
+	}
 	@PutMapping("/roles/{login}")
 	public AccountProfileForOwnerDto addManagerRole(@PathVariable String login, Principal principal) {
 		return ticketServiceOwner.addManagerRole(login, principal);
@@ -62,17 +66,12 @@ public class TicketServiceOwnerController {
 	public EventApprovedDto approveEvent(@RequestBody EventId eventId, Principal principal) {
 		return ticketServiceOwner.approveEvent(eventId, principal);
 	}
+
 	
-	
-	@GetMapping("/event/ticket/print")
-	Seat printTicket(SeatId seatId, String login, Principal principal) {
-		return ticketServiceOwner.printTicket(seatId, login, principal);
-	}
-	
-	@DeleteMapping("/event/ticket/discard")
-	Seat discardTicket(SeatId seatId, String login, Principal principal) {
-		return ticketServiceOwner.discardTicket(seatId, login, principal);
-	}
+//	@DeleteMapping("/event/ticket/discard")
+//	Seat discardTicket(SeatId seatId, String login, Principal principal) {
+//		return ticketServiceOwner.discardTicket(seatId, login, principal);
+//	}
 	
 	@GetMapping("/users")
 	Set<AccountProfileForOwnerDto> findAllUsers(@RequestParam int page, 
@@ -86,8 +85,8 @@ public class TicketServiceOwnerController {
 	}
 
 	@PutMapping("/hall/{hallId}/capacity/{maxCapacity}")
-	NewHallDto changeMaxCapacityToHall(@PathVariable String hallId, 
+	NewHallDto changeMaxHallCapacity(@PathVariable String hallId, 
 			@PathVariable Integer maxCapacity, Principal principal) {
-		return ticketServiceOwner.changeMaxCapacityToHall(hallId, maxCapacity, principal);
+		return ticketServiceOwner.changeHallMaxCapacity(hallId, maxCapacity, principal);
 	}
 }

@@ -87,7 +87,7 @@ public class AccountServiceImpl implements AccountService {
 	}
 
 	@Override
-	public AccountProfileDto removeManager(String token) {
+	public AccountProfileDto removeUser(String token) {
 		AccountCredentials credentials = accountConfiguration.tokenDecode(token);
 		UserAccount userAccount = repository.findById(credentials.getLogin()).get();
 		repository.delete(userAccount);

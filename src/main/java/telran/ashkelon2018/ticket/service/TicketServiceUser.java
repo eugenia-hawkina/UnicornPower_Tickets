@@ -8,6 +8,7 @@ import telran.ashkelon2018.ticket.domain.EventArchived;
 import telran.ashkelon2018.ticket.domain.EventId;
 import telran.ashkelon2018.ticket.domain.Seat;
 import telran.ashkelon2018.ticket.dto.EventListByDateDto;
+import telran.ashkelon2018.ticket.dto.EventListByHallDateDto;
 import telran.ashkelon2018.ticket.dto.TicketBookingDto;
 import telran.ashkelon2018.ticket.dto.TicketPayDto;
 
@@ -26,14 +27,20 @@ public interface TicketServiceUser {
 	boolean bookTicket(TicketBookingDto ticketPurchaseDto);
 	
 	boolean payTicket(TicketPayDto ticketPayDto);
+
+	Event receiveEventInfo(EventId eventId);
 	
+	Set<Event> receiveEventsByHallAndDate(EventListByHallDateDto filter, int page, int size);
+
 	
 	// for registered only!!!
+	
+	
 		
 	Set<Event> receiveVisitedEvents(Principal principal, int page, int size);	
 	
-	Set<Seat> getTickets(EventId eventId, String login);
+	Set<Seat> getTickets(EventId eventId, Principal principal);
 	
-	Set<Seat> discardTickets(EventId eventId, Set<Seat> seats, String login);
+//	Set<Seat> discardTickets(EventId eventId, Set<Seat> seats, String login);
 
 }

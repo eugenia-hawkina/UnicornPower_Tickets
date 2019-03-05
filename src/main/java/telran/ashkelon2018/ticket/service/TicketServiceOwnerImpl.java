@@ -17,8 +17,6 @@ import telran.ashkelon2018.ticket.dao.UserAccountRepository;
 import telran.ashkelon2018.ticket.domain.Event;
 import telran.ashkelon2018.ticket.domain.EventId;
 import telran.ashkelon2018.ticket.domain.Hall;
-import telran.ashkelon2018.ticket.domain.Seat;
-import telran.ashkelon2018.ticket.domain.SeatId;
 import telran.ashkelon2018.ticket.domain.UserAccount;
 import telran.ashkelon2018.ticket.dto.EventApprovedDto;
 import telran.ashkelon2018.ticket.dto.NewHallDto;
@@ -106,6 +104,31 @@ public class TicketServiceOwnerImpl implements TicketServiceOwner {
 				.build();
 	}
 
+	@Override
+	public ManagerAccountProfileDto removeHallFromManager(String login, String hallId, Principal principal) {
+		String id = principal.getName();
+		UserAccount owner = userAccountRepository.findById(id).orElse(null);
+		if(!owner.getRoles().contains(UserRole.OWNER)) {
+			throw new AccessDeniedException("Access denied, you are not an onwer");
+		}
+		if (!hallRepository.existsById(hallId)) {
+			throw new NotFoundException("No such hall");
+		}
+		if (!userAccountRepository.existsById(login)) {
+			throw new NotFoundException("No such user");
+		}
+		UserAccount userAccount = userAccountRepository.findById(login).get();
+		if (!userAccount.getRoles().contains(UserRole.MANAGER)) {
+			throw new UserHasNotRightsException("User not a MANAGER");
+		}
+		if(!userAccount.getHalls().contains(hallId)) {
+			throw new NotFoundException("User doesn't manage this hall");
+		}
+		userAccount.removeHall(hallId);
+		userAccountRepository.save(userAccount);
+		return convertToManagerAccountProfileDto(userAccount);
+	}
+	
 	@Override
 	public AccountProfileForOwnerDto removeManagerRole(String login, Principal principal) {
 		String id = principal.getName();
@@ -200,28 +223,16 @@ public class TicketServiceOwnerImpl implements TicketServiceOwner {
 				.build();
 	}
 
-	@Override
-	public Seat printTicket(SeatId seatId, String login, Principal principal) {
-		String id = principal.getName();
-		UserAccount owner = userAccountRepository.findById(id).orElse(null);
-		if(!owner.getRoles().contains(UserRole.OWNER)) {
-			throw new AccessDeniedException("Access denied, you are not an onwer");
-		}
-		// TODO Auto-generated method stub		
-		
-		return null;
-	}
-
-	@Override
-	public Seat discardTicket(SeatId seatId, String login, Principal principal) {
-		String id = principal.getName();
-		UserAccount owner = userAccountRepository.findById(id).orElse(null);
-		if(!owner.getRoles().contains(UserRole.OWNER)) {
-			throw new AccessDeniedException("Access denied, you are not an onwer");
-		}
-		// TODO Auto-generated method stub
-		return null;
-	}
+//	@Override
+//	public Seat discardTicket(SeatId seatId, String login, Principal principal) {
+//		String id = principal.getName();
+//		UserAccount owner = userAccountRepository.findById(id).orElse(null);
+//		if(!owner.getRoles().contains(UserRole.OWNER)) {
+//			throw new AccessDeniedException("Access denied, you are not an onwer");
+//		}
+//		//  Auto-generated method stub
+//		return null;
+//	}
 
 	@Override
 	public Set<AccountProfileForOwnerDto> findAllUsers(int page, int size, Principal principal) {
@@ -251,7 +262,7 @@ public class TicketServiceOwnerImpl implements TicketServiceOwner {
 	}
 
 	@Override
-	public NewHallDto changeMaxCapacityToHall(String hallId, Integer maxCapacity, Principal principal) {
+	public NewHallDto changeHallMaxCapacity(String hallId, Integer maxCapacity, Principal principal) {
 		if (!hallRepository.existsById(hallId)) {
 			throw new NotFoundException("No such hall");
 		}

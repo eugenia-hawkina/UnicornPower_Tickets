@@ -23,6 +23,7 @@ import telran.ashkelon2018.ticket.dto.EventCancellationDto;
 import telran.ashkelon2018.ticket.dto.EventListByHallDateDto;
 import telran.ashkelon2018.ticket.dto.NewEventDto;
 import telran.ashkelon2018.ticket.dto.SeatDto;
+import telran.ashkelon2018.ticket.dto.TicketGetForManagerDto;
 import telran.ashkelon2018.ticket.dto.UpdateEventDto;
 import telran.ashkelon2018.ticket.enums.EventStatus;
 import telran.ashkelon2018.ticket.enums.EventType;
@@ -126,15 +127,7 @@ public class TicketServiceManagerImpl implements TicketServiceManager {
 				.collect(Collectors.toSet());	
 	}
 
-	@Override
-	public Event receiveEventInfo(EventId eventId) {
-		Event event = eventRepository.findById(eventId).orElse(null);
-		if(event == null) {
-			throw new NotFoundException("Event not found");
-		}
-		return event;
-	}
- 
+
 	@Override
 	public Set<Event> receiveUserUpcomingEvents(Principal principal) {
 		String id = principal.getName();
@@ -142,60 +135,21 @@ public class TicketServiceManagerImpl implements TicketServiceManager {
 		return events;
 	}
 
-	@Override
-	public Set<Event> receiveEventList(EventListByHallDateDto filter, int page, int size) {
-		Set<Event> eventsAll = new HashSet<>();
-		Set<EventArchived> eventsArchivedAll = new HashSet<>();
-		LocalDate dateFrom = filter.getDateFrom();
-		LocalDate dateTo = filter.getDateTo();
-		if(dateFrom == null || dateTo == null) {
-			throw new BadRequestException("I need two dates");
-		}
-		if(dateTo.isBefore(dateFrom)) {
-			LocalDate tmp = dateFrom;
-			dateFrom = dateTo;
-			dateTo = tmp;
-		}
-		String hallId = filter.getHallId();
-		if(dateFrom.isBefore(LocalDate.now()) && dateTo.isBefore(LocalDate.now())) {			
-			eventsArchivedAll.addAll(archivedEventRepository
-					.findByEventIdHallIdAndEventIdEventStartBetween(hallId, dateFrom, dateTo)
-					.skip(size * (page - 1))
-					.limit(size)
-					.collect(Collectors.toSet()));
-			eventsAll = eventsArchivedAll.stream()
-					.map(e -> convertArchivedEventToEvent(e))
-					.collect(Collectors.toSet());
-		}
-		if (dateFrom.isAfter(LocalDate.now()) && dateTo.isAfter(LocalDate.now())) {			
-			eventsAll.addAll(eventRepository
-					.findByEventIdHallIdAndEventIdEventStartBetween(hallId, dateFrom, dateTo)
-					.skip(size * (page - 1))
-					.limit(size)
-					.collect(Collectors.toSet()));
-		}
-		// FIXME combine info from two repositories
-		if(dateFrom.isBefore(LocalDate.now()) && dateTo.isAfter(LocalDate.now())) {
-			throw new BadRequestException("Both dates should be either beforeNow or afterNow");
-		}
-		return eventsAll;
-	}
-
-	private Event convertArchivedEventToEvent(EventArchived e) {
-		return 	Event.builder()
-					.eventStatus(e.getEventStatus())
-					.eventName(e.getEventName())
-					.artist(e.getArtist())
-					.eventId(e.getEventId())
-					.eventDurationMinutes(e.getEventDurationMinutes())
-					.seats(e.getSeats())
-					.eventType(e.getEventType())
-					.description(e.getDescription())
-					.images(e.getImages())
-					.cancellationReason(e.getCancellationReason())
-					.userId(e.getUserId())
-					.build();
-	}
+//	private Event convertArchivedEventToEvent(EventArchived e) {
+//		return 	Event.builder()
+//					.eventStatus(e.getEventStatus())
+//					.eventName(e.getEventName())
+//					.artist(e.getArtist())
+//					.eventId(e.getEventId())
+//					.eventDurationMinutes(e.getEventDurationMinutes())
+//					.seats(e.getSeats())
+//					.eventType(e.getEventType())
+//					.description(e.getDescription())
+//					.images(e.getImages())
+//					.cancellationReason(e.getCancellationReason())
+//					.userId(e.getUserId())
+//					.build();
+//	}
 
 	@Override
 	public Event cancelEvent(EventCancellationDto eventCancellation, Principal principal) {
@@ -223,6 +177,31 @@ public class TicketServiceManagerImpl implements TicketServiceManager {
 		cancelledEventRepository.save(cancelledEvent);	
 		eventRepository.deleteById(eventId);
 		return event;
+	}
+
+	@Override
+	public Set<Seat> getTickets(TicketGetForManagerDto dto, Principal principal) {
+		String id = principal.getName();
+		UserAccount manager = userAccountRepository.findById(id).orElse(null);
+		if(!manager.getRoles().contains(UserRole.MANAGER)) {
+			throw new AccessDeniedException("Access denied, you are not a manager");
+		}
+		String login = dto.getLogin();
+		EventId eventId = dto.getEventId();
+		if(login == null || eventId == null) {
+			throw new BadRequestException("Bad Request, information missing");
+		}		
+		Event event = eventRepository.findById(eventId).orElse(null);
+		if(event == null) {
+			throw new BadRequestException("Event doesn't exist");
+		}
+		Set<Seat> seats = event.getSeats().stream()
+			.filter(s -> s.getBuyerInfo().equals(login))
+			.collect(Collectors.toSet());
+		if(seats.size() == 0) {
+			throw new NotFoundException("User didn't visit this event");
+		}
+		return seats;
 	}
 
 }

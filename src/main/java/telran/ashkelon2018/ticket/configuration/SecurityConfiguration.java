@@ -28,22 +28,36 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter{
 		http.csrf().disable();
 		http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 		 
-		http.authorizeRequests().antMatchers(HttpMethod.PUT, "/account/password").hasRole(UserRole.USER.name());
-		http.authorizeRequests().antMatchers(HttpMethod.PUT, "/account/update").hasRole(UserRole.USER.name());
+		// account requests
+		http.authorizeRequests()
+			.antMatchers("/account/login")
+			.hasRole(UserRole.USER.name());
 		
-		http.authorizeRequests().antMatchers(HttpMethod.GET, "/account/manager").hasRole(UserRole.MANAGER.name());
-		http.authorizeRequests().antMatchers(HttpMethod.PUT, "/account/manager/update").hasRole(UserRole.MANAGER.name());
+		http.authorizeRequests()
+			.antMatchers(HttpMethod.PUT, "/account/password")
+			.hasRole(UserRole.USER.name());
 		
-		// FIXME permit psw change to all users;
-		http.authorizeRequests().antMatchers(HttpMethod.DELETE, "/account/manager/remove").hasRole(UserRole.MANAGER.name());
+		http.authorizeRequests()
+			.antMatchers(HttpMethod.PUT, "/account/update")
+			.hasRole(UserRole.USER.name());		
+
+		http.authorizeRequests()
+			.antMatchers(HttpMethod.DELETE, "/account/user/remove")
+			.permitAll();
 		
+		
+		// all
+		http.authorizeRequests().antMatchers("/event/**").permitAll();	
+		http.authorizeRequests().antMatchers("/events/**").permitAll();
+		
+		// owner 
 		http.authorizeRequests().antMatchers("/owner/**").hasRole(UserRole.OWNER.name());
-		
+				
+		// manager 
 		http.authorizeRequests().antMatchers("/manager/**").hasRole(UserRole.MANAGER.name());
 		
-		http.authorizeRequests().antMatchers("/user/**").permitAll();
-		
-		http.authorizeRequests().antMatchers("/event/**").permitAll();
-		
+		// user 
+		http.authorizeRequests().antMatchers("/user/**").hasRole(UserRole.USER.name());
+
 	}
 }

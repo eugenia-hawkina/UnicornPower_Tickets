@@ -15,7 +15,7 @@ public interface AccountService {
 	//manager
 	AccountProfileDto addManager(AccountRegDto accountRegDto, String token);
 	
-	AccountProfileDto removeManager(String token);
+	AccountProfileDto removeUser(String token);
 
 	// user
 	AccountProfileDto addUser(AccountRegDto accountRegDto, String token);
