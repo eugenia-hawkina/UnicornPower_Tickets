@@ -1,8 +1,6 @@
 package telran.ashkelon2018.ticket.service;
 
 import java.security.Principal;
-import java.time.LocalDate;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -14,13 +12,11 @@ import telran.ashkelon2018.ticket.dao.EventCancelledRepository;
 import telran.ashkelon2018.ticket.dao.EventRepository;
 import telran.ashkelon2018.ticket.dao.UserAccountRepository;
 import telran.ashkelon2018.ticket.domain.Event;
-import telran.ashkelon2018.ticket.domain.EventArchived;
 import telran.ashkelon2018.ticket.domain.EventCancelled;
 import telran.ashkelon2018.ticket.domain.EventId;
 import telran.ashkelon2018.ticket.domain.Seat;
 import telran.ashkelon2018.ticket.domain.UserAccount;
 import telran.ashkelon2018.ticket.dto.EventCancellationDto;
-import telran.ashkelon2018.ticket.dto.EventListByHallDateDto;
 import telran.ashkelon2018.ticket.dto.NewEventDto;
 import telran.ashkelon2018.ticket.dto.SeatDto;
 import telran.ashkelon2018.ticket.dto.TicketGetForManagerDto;
@@ -129,27 +125,11 @@ public class TicketServiceManagerImpl implements TicketServiceManager {
 
 
 	@Override
-	public Set<Event> receiveUserUpcomingEvents(Principal principal) {
+	public Set<Event> receiveMyUpcomingEvents(Principal principal) {
 		String id = principal.getName();
 		Set<Event> events = eventRepository.findByUserId(id);
 		return events;
 	}
-
-//	private Event convertArchivedEventToEvent(EventArchived e) {
-//		return 	Event.builder()
-//					.eventStatus(e.getEventStatus())
-//					.eventName(e.getEventName())
-//					.artist(e.getArtist())
-//					.eventId(e.getEventId())
-//					.eventDurationMinutes(e.getEventDurationMinutes())
-//					.seats(e.getSeats())
-//					.eventType(e.getEventType())
-//					.description(e.getDescription())
-//					.images(e.getImages())
-//					.cancellationReason(e.getCancellationReason())
-//					.userId(e.getUserId())
-//					.build();
-//	}
 
 	@Override
 	public Event cancelEvent(EventCancellationDto eventCancellation, Principal principal) {

@@ -1,6 +1,7 @@
 package telran.ashkelon2018.ticket.service;
 
 import java.security.Principal;
+import java.util.List;
 import java.util.Set;
 
 import telran.ashkelon2018.ticket.domain.Event;
@@ -9,8 +10,10 @@ import telran.ashkelon2018.ticket.domain.EventId;
 import telran.ashkelon2018.ticket.domain.Seat;
 import telran.ashkelon2018.ticket.dto.EventListByDateDto;
 import telran.ashkelon2018.ticket.dto.EventListByHallDateDto;
+import telran.ashkelon2018.ticket.dto.EventSearchDto;
 import telran.ashkelon2018.ticket.dto.TicketBookingDto;
 import telran.ashkelon2018.ticket.dto.TicketPayDto;
+import telran.ashkelon2018.ticket.enums.EventType;
 
 public interface TicketServiceUser {
 	
@@ -24,18 +27,19 @@ public interface TicketServiceUser {
 	
 	Set<Event> receiveEventsByArtist(String artist, int page, int size);
 	
+	Set<Event> receiveEventsByHallAndDate(EventListByHallDateDto filter, int page, int size);
+	
+	Set<Event> receiveEventsByEventType(EventType eventType, int page, int size);
+	
+	List<Event> searchEvents(EventSearchDto eventSearchDto, int page, int size);
+	
 	boolean bookTicket(TicketBookingDto ticketPurchaseDto);
 	
 	boolean payTicket(TicketPayDto ticketPayDto);
 
 	Event receiveEventInfo(EventId eventId);
 	
-	Set<Event> receiveEventsByHallAndDate(EventListByHallDateDto filter, int page, int size);
-
-	
 	// for registered only!!!
-	
-	
 		
 	Set<Event> receiveVisitedEvents(Principal principal, int page, int size);	
 	

@@ -9,6 +9,7 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import telran.ashkelon2018.ticket.domain.Event;
 import telran.ashkelon2018.ticket.domain.EventId;
 import telran.ashkelon2018.ticket.enums.EventStatus;
+import telran.ashkelon2018.ticket.enums.EventType;
 
 public interface EventRepository extends MongoRepository<Event, EventId> {
 	
@@ -25,5 +26,9 @@ public interface EventRepository extends MongoRepository<Event, EventId> {
 	Stream<Event> findByEventIdHallId(String hallId);
 	
 	Stream<Event> findByArtist(String artist);
+	
+	Stream<Event> findByEventIdEventStartBefore(LocalDate to);
+
+	Stream<Event> findByEventType(EventType eventType);
 	
 }

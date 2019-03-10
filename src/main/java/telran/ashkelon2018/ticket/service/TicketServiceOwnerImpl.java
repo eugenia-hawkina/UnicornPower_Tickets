@@ -193,6 +193,25 @@ public class TicketServiceOwnerImpl implements TicketServiceOwner {
 				.collect(Collectors.toSet()));
 		return hiddenEvents;
 	}
+	
+	@Override
+	public Set<Event> receiveActiveAndHiddenEventsByHall(int page, int size, String hallId, Principal principal){
+		String id = principal.getName();
+		UserAccount owner = userAccountRepository.findById(id).orElse(null);
+		if(!owner.getRoles().contains(UserRole.OWNER)) {
+			throw new AccessDeniedException("Access denied, you are not an onwer");
+		}
+		Hall hall = hallRepository.findById(hallId).orElse(null); 
+		if(hall == null) {
+			throw new NotFoundException("Hall not found");
+		}
+		Set<Event> events = new HashSet<>();
+		events.addAll(eventRepository.findByEventIdHallId(hallId)
+				.skip(size * (page - 1))
+				.limit(size)
+				.collect(Collectors.toSet()));
+		return events;
+	}
 
 	@Override
 	public EventApprovedDto approveEvent(EventId eventId, Principal principal) {
@@ -223,28 +242,39 @@ public class TicketServiceOwnerImpl implements TicketServiceOwner {
 				.build();
 	}
 
-//	@Override
-//	public Seat discardTicket(SeatId seatId, String login, Principal principal) {
-//		String id = principal.getName();
-//		UserAccount owner = userAccountRepository.findById(id).orElse(null);
-//		if(!owner.getRoles().contains(UserRole.OWNER)) {
-//			throw new AccessDeniedException("Access denied, you are not an onwer");
-//		}
-//		//  Auto-generated method stub
-//		return null;
-//	}
-
 	@Override
 	public Set<AccountProfileForOwnerDto> findAllUsers(int page, int size, Principal principal) {
 		Set<AccountProfileForOwnerDto> allUsers = new HashSet<>();
 		allUsers = userAccountRepository.findAllBy()
 			.skip(size * (page - 1))
 			.limit(size)		
-			.map(user -> convertToAccountProfileForOwnerDto(user))
-			.collect(Collectors.toSet());
+			.map(user -> convertToAccountProfileForOwnerDto(user))			.collect(Collectors.toSet());
 		return allUsers;
 	}
 
+	@Override
+	public Set<AccountProfileForOwnerDto> findAllManagers(int page, int size, Principal principal){
+		Set<AccountProfileForOwnerDto> allManagers = new HashSet<>();
+		allManagers = userAccountRepository.findManagersByRolesIn(UserRole.MANAGER)
+			.skip(size * (page - 1))
+			.limit(size)		
+			.map(user -> convertToAccountProfileForOwnerDto(user))
+			.collect(Collectors.toSet());
+		return allManagers;
+	}
+	
+	@Override
+	public Set<Event> findManagerUpcomingEvents(int page, int size, String login, Principal principal){
+		UserAccount manager = userAccountRepository.findById(login).orElse(null);
+		if(manager == null) {
+			throw new NotFoundException("Manager not found");
+		}
+		if(!manager.getRoles().contains(UserRole.MANAGER)) {
+			throw new BadRequestException("User not a manager");
+		}
+		return eventRepository.findByUserId(login);
+		}
+	
 	@Override
 	public boolean addHall(NewHallDto newHallDto, Principal principal) {
 		if(hallRepository.existsById(newHallDto.getHallId())) {

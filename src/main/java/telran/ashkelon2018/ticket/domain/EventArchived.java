@@ -6,6 +6,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,6 +21,7 @@ import telran.ashkelon2018.ticket.enums.EventType;
 @AllArgsConstructor
 @ToString
 @EqualsAndHashCode(of = { "eventId" })
+@Builder
 @Document(collection="ticketService_ArchivedEvents")
 public class EventArchived {
 	EventStatus eventStatus;

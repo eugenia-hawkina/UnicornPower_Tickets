@@ -62,21 +62,33 @@ public class TicketServiceOwnerController {
 		return ticketServiceOwner.receiveHiddenEvents(principal);
 	}
 	
+	@GetMapping("/events/hall/{hallId}")
+	public Set<Event> receiveActiveAndHiddenEventsByHall(@RequestParam int page, 
+			@RequestParam int size, @PathVariable String hallId, Principal principal){
+		return ticketServiceOwner.receiveActiveAndHiddenEventsByHall(page, size, hallId, principal);
+	}
+	
 	@PutMapping("/event/approve")
 	public EventApprovedDto approveEvent(@RequestBody EventId eventId, Principal principal) {
 		return ticketServiceOwner.approveEvent(eventId, principal);
 	}
-
-	
-//	@DeleteMapping("/event/ticket/discard")
-//	Seat discardTicket(SeatId seatId, String login, Principal principal) {
-//		return ticketServiceOwner.discardTicket(seatId, login, principal);
-//	}
 	
 	@GetMapping("/users")
 	Set<AccountProfileForOwnerDto> findAllUsers(@RequestParam int page, 
 			@RequestParam int size, Principal principal){
 		return ticketServiceOwner.findAllUsers(page, size, principal);
+	}
+	
+	@GetMapping("/managers")
+	Set<AccountProfileForOwnerDto> findAllManagers(@RequestParam int page, 
+			@RequestParam int size, Principal principal){
+		return ticketServiceOwner.findAllManagers(page, size, principal);
+	}
+	
+	@GetMapping("/{login}/events")
+	Set<Event> findManagerUpcomingEvents(@RequestParam int page, @RequestParam int size, 
+			@PathVariable String login, Principal principal){
+		return ticketServiceOwner.findManagerUpcomingEvents(page, size, login, principal);
 	}
 	
 	@PostMapping("/hall/new")

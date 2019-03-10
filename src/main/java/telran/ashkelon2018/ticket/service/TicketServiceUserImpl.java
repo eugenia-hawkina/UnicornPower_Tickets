@@ -5,7 +5,9 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -28,9 +30,11 @@ import telran.ashkelon2018.ticket.domain.Seat;
 import telran.ashkelon2018.ticket.domain.UserAccount;
 import telran.ashkelon2018.ticket.dto.EventListByDateDto;
 import telran.ashkelon2018.ticket.dto.EventListByHallDateDto;
+import telran.ashkelon2018.ticket.dto.EventSearchDto;
 import telran.ashkelon2018.ticket.dto.TicketBookingDto;
 import telran.ashkelon2018.ticket.dto.TicketPayDto;
 import telran.ashkelon2018.ticket.enums.EventStatus;
+import telran.ashkelon2018.ticket.enums.EventType;
 import telran.ashkelon2018.ticket.exceptions.BadRequestException;
 import telran.ashkelon2018.ticket.exceptions.NotFoundException;
 import telran.ashkelon2018.ticket.exceptions.SeatNotAvailableException;
@@ -164,6 +168,10 @@ public class TicketServiceUserImpl implements TicketServiceUser {
 	@Override
 	public boolean bookTicket(TicketBookingDto ticketPurchaseDto) {
 		EventId eventId = ticketPurchaseDto.getEventId();
+		LocalDateTime startTime = eventId.getEventStart();
+		if(startTime.isBefore(LocalDateTime.now().minusMinutes(120))) {
+			throw new SeatNotAvailableException("Less than 2 hours before event, tickets available only in ticket office");
+		};
 		String login = ticketPurchaseDto.getLogin();
 		Set<Seat> seats = ticketPurchaseDto.getSeats();
 		Event event = eventRepository.findById(eventId).orElse(null);
@@ -391,5 +399,40 @@ public class TicketServiceUserImpl implements TicketServiceUser {
 		}
 		return eventsAll;
 	}
+	
+	public Set<Event> receiveEventsByEventType(EventType eventType, int page, int size){
+		Set<Event> events = new HashSet<>();
+		events.addAll(eventRepository				
+				.findByEventType(eventType)
+				.filter(e -> e.getEventStatus().equals(EventStatus.ACTIVE))
+				.skip(size * (page - 1))
+				.limit(size)
+				.collect(Collectors.toSet()));
+		return events;
+	}
+	
+	public 	List<Event> searchEvents(EventSearchDto eventSearchDto, int page, int size){
+	//	Set<Event> events = new HashSet<>();
+		List<Event> events = new ArrayList<>();
+		LocalDate dateFrom = eventSearchDto.getDateFrom();
+		LocalDate dateTo = eventSearchDto.getDateTo();
+		String artist = eventSearchDto.getArtist();
+		EventType eventType = eventSearchDto.getEventType();
+		String hallId = eventSearchDto.getHallId();
+		Query query = new Query();
+		query.addCriteria(Criteria.where("eventStatus").regex("^A"));
+		
+		if(dateFrom != null) {
+			query.addCriteria(Criteria.where("_id.eventStart").gte(dateFrom));
+		}
+		// FIXME dates between
+//		if(dateTo != null) {
+//			query.addCriteria(Criteria.where("_id.eventStart").lte(dateTo));
+//		}
+		System.out.println(query);
+		events = mongoTemplate.find(query, Event.class);
+		return events;
+	}
+
 
 }

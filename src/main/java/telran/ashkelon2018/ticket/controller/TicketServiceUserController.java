@@ -1,12 +1,12 @@
 package telran.ashkelon2018.ticket.controller;
 
 import java.security.Principal;
+import java.util.List;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,12 +19,13 @@ import telran.ashkelon2018.ticket.domain.EventId;
 import telran.ashkelon2018.ticket.domain.Seat;
 import telran.ashkelon2018.ticket.dto.EventListByDateDto;
 import telran.ashkelon2018.ticket.dto.EventListByHallDateDto;
+import telran.ashkelon2018.ticket.dto.EventSearchDto;
 import telran.ashkelon2018.ticket.dto.TicketBookingDto;
 import telran.ashkelon2018.ticket.dto.TicketPayDto;
+import telran.ashkelon2018.ticket.enums.EventType;
 import telran.ashkelon2018.ticket.service.TicketServiceUser;
 
 @RestController
-@RequestMapping
 public class TicketServiceUserController {
 	
 	@Autowired
@@ -57,6 +58,18 @@ public class TicketServiceUserController {
 		return ticketServiceUser.receiveEventsByArtist(artist, page, size);
 	}
 	
+	@GetMapping("/events/{eventType}")
+	public Set<Event> receiveEventsByEventType(@PathVariable EventType eventType, 
+			@RequestParam int page, @RequestParam int size){
+		return ticketServiceUser.receiveEventsByEventType(eventType, page, size);
+	}
+	
+	@PutMapping("events/search")
+	public List<Event> searchEvents(@RequestBody EventSearchDto eventSearchDto, 
+			@RequestParam int page, @RequestParam int size){
+		return ticketServiceUser.searchEvents(eventSearchDto, page, size);
+	}
+	
 	@PutMapping("/event/ticket/booking")
 	public boolean bookTicket(@RequestBody TicketBookingDto ticketPurchaseDto) {
 		return ticketServiceUser.bookTicket(ticketPurchaseDto);
@@ -87,9 +100,5 @@ public class TicketServiceUserController {
 	public Set<Event> receiveEventsByHallAndDate(@RequestBody EventListByHallDateDto filter, @RequestParam int page, @RequestParam int size){
 		return ticketServiceUser.receiveEventsByHallAndDate(filter, page, size);
 	}
-	
-//	@DeleteMapping("/event/ticket/discard")
-//	Set<Seat> discardTickets(@RequestBody EventId eventId, Set<Seat> seats, String login) {
-//		return ticketServiceUser.discardTickets(eventId, seats, login);
-//	}
+
 }

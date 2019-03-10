@@ -18,7 +18,7 @@ public interface TicketServiceManager {
 	
 	Event updateEvent(UpdateEventDto updateEventDto, Principal principal);
 
-	Set<Event> receiveUserUpcomingEvents(Principal principal);	
+	Set<Event> receiveMyUpcomingEvents(Principal principal);	
 	
 	Event cancelEvent(EventCancellationDto eventCancellation, Principal principal);
 		

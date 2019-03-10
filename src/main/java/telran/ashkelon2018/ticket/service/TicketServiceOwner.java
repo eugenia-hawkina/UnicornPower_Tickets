@@ -17,6 +17,10 @@ public interface TicketServiceOwner {
 	
 	Set<AccountProfileForOwnerDto> findAllUsers(int page, int size, Principal principal);
 	
+	Set<AccountProfileForOwnerDto> findAllManagers(int page, int size, Principal principal);
+	
+	Set<Event> findManagerUpcomingEvents(int page, int size, String login, Principal principal);
+	
 	ManagerAccountProfileDto addHallToManager(String login, String hallId, Principal principal);
 	
 	ManagerAccountProfileDto removeHallFromManager(String login, String hallId, Principal principal);
@@ -27,9 +31,9 @@ public interface TicketServiceOwner {
 	
 	Set<Event> receiveHiddenEvents(Principal principal);
 	
-	EventApprovedDto approveEvent(EventId eventId, Principal principal);
+	Set<Event> receiveActiveAndHiddenEventsByHall(int page, int size, String hallId, Principal principal);
 	
-//	Seat discardTicket(SeatId seatId, String login, Principal principal);
+	EventApprovedDto approveEvent(EventId eventId, Principal principal);
 	
 	boolean addHall(NewHallDto newHallDto, Principal principal);
 
