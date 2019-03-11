@@ -55,16 +55,16 @@ public class TicketServiceOwnerImpl implements TicketServiceOwner {
 			throw new AccessDeniedException("Access denied, you are not an onwer");
 		}
 		
-		if (!userAccountRepository.existsById(login)) {
+		if (!userAccountRepository.existsById(login.toLowerCase())) {
 			throw new NotFoundException("No such user");
 		}
-		UserAccount userAccount = userAccountRepository.findById(login).get();
+		UserAccount userAccount = userAccountRepository.findById(login.toLowerCase()).get();
 		return convertToAccountProfileForOwnerDto(userAccount);
 	}
 
 	private AccountProfileForOwnerDto convertToAccountProfileForOwnerDto(UserAccount account) {
 		return AccountProfileForOwnerDto.builder()
-				.login(account.getLogin())
+				.login(account.getLogin().toLowerCase())
 				.name(account.getName())
 				.phone(account.getPhone())
 				.roles(account.getRoles())
@@ -83,10 +83,10 @@ public class TicketServiceOwnerImpl implements TicketServiceOwner {
 		if (!hallRepository.existsById(hallId)) {
 			throw new NotFoundException("No such hall");
 		}
-		if (!userAccountRepository.existsById(login)) {
+		if (!userAccountRepository.existsById(login.toLowerCase())) {
 			throw new NotFoundException("No such user");
 		}
-		UserAccount userAccount = userAccountRepository.findById(login).get();
+		UserAccount userAccount = userAccountRepository.findById(login.toLowerCase()).get();
 		if (!userAccount.getRoles().contains(UserRole.MANAGER)) {
 			throw new UserHasNotRightsException("User not a MANAGER");
 		}
@@ -97,7 +97,7 @@ public class TicketServiceOwnerImpl implements TicketServiceOwner {
 
 	private ManagerAccountProfileDto convertToManagerAccountProfileDto(UserAccount manager) {
 		return ManagerAccountProfileDto.builder()
-				.login(manager.getLogin())
+				.login(manager.getLogin().toLowerCase())
 				.name(manager.getName())
 				.phone(manager.getPhone())
 				.halls(manager.getHalls())
@@ -114,10 +114,10 @@ public class TicketServiceOwnerImpl implements TicketServiceOwner {
 		if (!hallRepository.existsById(hallId)) {
 			throw new NotFoundException("No such hall");
 		}
-		if (!userAccountRepository.existsById(login)) {
+		if (!userAccountRepository.existsById(login.toLowerCase())) {
 			throw new NotFoundException("No such user");
 		}
-		UserAccount userAccount = userAccountRepository.findById(login).get();
+		UserAccount userAccount = userAccountRepository.findById(login.toLowerCase()).get();
 		if (!userAccount.getRoles().contains(UserRole.MANAGER)) {
 			throw new UserHasNotRightsException("User not a MANAGER");
 		}
@@ -136,10 +136,10 @@ public class TicketServiceOwnerImpl implements TicketServiceOwner {
 		if(!owner.getRoles().contains(UserRole.OWNER)) {
 			throw new AccessDeniedException("Access denied, you are not an onwer");
 		}
-		if (!userAccountRepository.existsById(login)) {
+		if (!userAccountRepository.existsById(login.toLowerCase())) {
 			throw new NotFoundException("No such user");
 		}
-		UserAccount userAccount = userAccountRepository.findById(login).get();
+		UserAccount userAccount = userAccountRepository.findById(login.toLowerCase()).get();
 		if (!userAccount.getRoles().contains(UserRole.MANAGER)) {
 			throw new UserHasNotRightsException("User not a MANAGER");
 		}
@@ -155,10 +155,10 @@ public class TicketServiceOwnerImpl implements TicketServiceOwner {
 		if(!owner.getRoles().contains(UserRole.OWNER)) {
 			throw new AccessDeniedException("Access denied, you are not an onwer");
 		}
-		if (!userAccountRepository.existsById(login)) {
+		if (!userAccountRepository.existsById(login.toLowerCase())) {
 			throw new NotFoundException("No such user");
 		}
-		UserAccount userAccount = userAccountRepository.findById(login).get();
+		UserAccount userAccount = userAccountRepository.findById(login.toLowerCase()).get();
 		userAccount.addRole(UserRole.MANAGER);
 		userAccountRepository.save(userAccount);
 		return convertToAccountProfileForOwnerDto(userAccount);
@@ -265,14 +265,14 @@ public class TicketServiceOwnerImpl implements TicketServiceOwner {
 	
 	@Override
 	public Set<Event> findManagerUpcomingEvents(int page, int size, String login, Principal principal){
-		UserAccount manager = userAccountRepository.findById(login).orElse(null);
+		UserAccount manager = userAccountRepository.findById(login.toLowerCase()).orElse(null);
 		if(manager == null) {
 			throw new NotFoundException("Manager not found");
 		}
 		if(!manager.getRoles().contains(UserRole.MANAGER)) {
 			throw new BadRequestException("User not a manager");
 		}
-		return eventRepository.findByUserId(login);
+		return eventRepository.findByUserId(login.toLowerCase());
 		}
 	
 	@Override

@@ -8,7 +8,6 @@ import javax.validation.constraints.NotNull;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -21,7 +20,6 @@ import telran.ashkelon2018.ticket.enums.UserRole;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
 @Builder
 @ToString
 @EqualsAndHashCode(of="login")
@@ -41,12 +39,12 @@ public class UserAccount {
 	Set<EventId> visitedEvents;
 	
 	public UserAccount(String login, @NotNull String password) {
-		this.login = login;
+		this.login = login.toLowerCase();
 		this.password = password;
 	}
 	
 	public UserAccount(String login, @NotNull String password, String name, String phone) {
-		this.login = login;
+		this.login = login.toLowerCase();
 		this.password = password;
 		this.name = name;
 		this.phone = phone;
@@ -54,12 +52,23 @@ public class UserAccount {
 	
 	public UserAccount(String login, @NotNull String password, String name, String phone, 
 			Set<UserRole> roles) {
-		this.login = login;
+		this.login = login.toLowerCase();
 		this.password = password;
 		this.name = name;
 		this.phone = phone;
 		this.roles = roles;
 		this.visitedEvents = new HashSet<EventId>();		
+	}
+	
+	public UserAccount(String login, @NotNull String password, String name, String phone, Set<String> halls,
+			Set<UserRole> roles, Set<EventId> visitedEvents) {
+		this.login = login.toLowerCase();
+		this.password = password;
+		this.name = name;
+		this.phone = phone;
+		this.halls = halls;
+		this.roles = roles;
+		this.visitedEvents = visitedEvents;
 	}
 	
 	public void addHall(String hallId) {
@@ -84,7 +93,5 @@ public class UserAccount {
 	
 	public void removeVisitedEvent(EventId event) {
 		visitedEvents.remove(event);
-	}
-
-	
+	}	
 }

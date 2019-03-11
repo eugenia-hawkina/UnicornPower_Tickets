@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import telran.ashkelon2018.ticket.domain.Event;
+import telran.ashkelon2018.ticket.domain.EventArchived;
 import telran.ashkelon2018.ticket.domain.Seat;
 import telran.ashkelon2018.ticket.dto.EventCancellationDto;
 import telran.ashkelon2018.ticket.dto.NewEventDto;
@@ -40,6 +41,11 @@ public class TicketServiceManagerController {
 	public Set<Event> receiveMyUpcomingEvents(Principal principal){
 		return ticketService.receiveMyUpcomingEvents(principal);
 	}	
+	
+	@GetMapping("/manager/events/archived")
+	public Set<EventArchived> receiveMyArchivedEvents(Principal principal){
+		return ticketService.receiveMyArchivedEvents(principal);
+	}
 	
 	@PutMapping("/manager/event/cancellation")
 	public Event cancelEvent(@RequestBody EventCancellationDto eventCancellation, Principal principal) {

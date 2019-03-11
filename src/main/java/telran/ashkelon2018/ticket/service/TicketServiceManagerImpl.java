@@ -12,6 +12,7 @@ import telran.ashkelon2018.ticket.dao.EventCancelledRepository;
 import telran.ashkelon2018.ticket.dao.EventRepository;
 import telran.ashkelon2018.ticket.dao.UserAccountRepository;
 import telran.ashkelon2018.ticket.domain.Event;
+import telran.ashkelon2018.ticket.domain.EventArchived;
 import telran.ashkelon2018.ticket.domain.EventCancelled;
 import telran.ashkelon2018.ticket.domain.EventId;
 import telran.ashkelon2018.ticket.domain.Seat;
@@ -39,7 +40,7 @@ public class TicketServiceManagerImpl implements TicketServiceManager {
 	EventCancelledRepository cancelledEventRepository;
 	
 	@Autowired
-	EventArchivedRepository archivedEventRepository;
+	EventArchivedRepository eventArchivedRepository;
 	
 	@Autowired
 	UserAccountRepository userAccountRepository;
@@ -132,6 +133,12 @@ public class TicketServiceManagerImpl implements TicketServiceManager {
 	}
 
 	@Override
+	public Set<EventArchived> receiveMyArchivedEvents(Principal principal) {
+		String id = principal.getName();
+		Set<EventArchived> events = eventArchivedRepository.findByUserId(id);
+		return events;
+	}
+	@Override
 	public Event cancelEvent(EventCancellationDto eventCancellation, Principal principal) {
 		String managerId = principal.getName();
 		UserAccount manager = userAccountRepository.findById(managerId).orElse(null);
@@ -166,7 +173,7 @@ public class TicketServiceManagerImpl implements TicketServiceManager {
 		if(!manager.getRoles().contains(UserRole.MANAGER)) {
 			throw new AccessDeniedException("Access denied, you are not a manager");
 		}
-		String login = dto.getLogin();
+		String login = dto.getLogin().toLowerCase();
 		EventId eventId = dto.getEventId();
 		if(login == null || eventId == null) {
 			throw new BadRequestException("Bad Request, information missing");

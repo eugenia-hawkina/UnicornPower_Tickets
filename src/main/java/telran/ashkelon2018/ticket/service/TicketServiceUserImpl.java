@@ -172,7 +172,7 @@ public class TicketServiceUserImpl implements TicketServiceUser {
 		if(startTime.isBefore(LocalDateTime.now().minusMinutes(120))) {
 			throw new SeatNotAvailableException("Less than 2 hours before event, tickets available only in ticket office");
 		};
-		String login = ticketPurchaseDto.getLogin();
+		String login = ticketPurchaseDto.getLogin().toLowerCase();
 		Set<Seat> seats = ticketPurchaseDto.getSeats();
 		Event event = eventRepository.findById(eventId).orElse(null);
 		if(event == null) {
@@ -222,7 +222,7 @@ public class TicketServiceUserImpl implements TicketServiceUser {
 		private TaskImpl(Seat seat, EventId eventId, String login) {
 			this.seat = seat;
 			this.eventId = eventId;
-			this.login = login;
+			this.login = login.toLowerCase();
 		}
 		
 		@Override
@@ -272,7 +272,7 @@ public class TicketServiceUserImpl implements TicketServiceUser {
 	@Override
 	public boolean payTicket(TicketPayDto ticketPayDto) {
 		EventId eventId = ticketPayDto.getEventId();
-		String login = ticketPayDto.getLogin();
+		String login = ticketPayDto.getLogin().toLowerCase();
 		Set<Seat> seats = ticketPayDto.getSeats();
 		boolean paid = ticketPayDto.isPaid();
 		if(!paid) {
@@ -324,7 +324,7 @@ public class TicketServiceUserImpl implements TicketServiceUser {
 
 	@Override
 	public Set<Seat> getTickets(EventId eventId, Principal principal) {
-		String login = principal.getName();
+		String login = principal.getName().toLowerCase();
 		UserAccount user = userAccountRepository.findById(login).orElse(null);
 		Set<EventId> eventIds = user.getVisitedEvents();
 		if(!eventIds.contains(eventId)) {
@@ -420,19 +420,41 @@ public class TicketServiceUserImpl implements TicketServiceUser {
 		EventType eventType = eventSearchDto.getEventType();
 		String hallId = eventSearchDto.getHallId();
 		Query query = new Query();
-		query.addCriteria(Criteria.where("eventStatus").regex("^A"));
-		
-		if(dateFrom != null) {
+		query.addCriteria(Criteria.where("eventStatus").regex("^A"));		
+		if(dateFrom != null && dateTo != null) {
+			query.addCriteria(Criteria.where("_id.eventStart").gte(dateFrom).lte(dateTo));
+		} 
+		// FIXME date from not included
+		if(dateFrom != null && dateTo == null) {
 			query.addCriteria(Criteria.where("_id.eventStart").gte(dateFrom));
 		}
-		// FIXME dates between
-//		if(dateTo != null) {
-//			query.addCriteria(Criteria.where("_id.eventStart").lte(dateTo));
-//		}
-		System.out.println(query);
+		if(dateFrom == null && dateTo != null) {
+			query.addCriteria(Criteria.where("_id.eventStart").lte(dateTo));
+		}
+		if(artist != null && artist != "") {
+			query.addCriteria(Criteria.where("artist").regex("/*" + artist + "/*","i"));
+		}
+		if(eventType != null) {
+			query.addCriteria(Criteria.where("eventType").is(eventType));
+		}
+		if(hallId != null) {
+			query.addCriteria(Criteria.where("_id.hallId").is(hallId));
+		}
+		List <EventArchived> eventArc = mongoTemplate.find(query, EventArchived.class);		
 		events = mongoTemplate.find(query, Event.class);
-		return events;
+	
+		ArrayList<Event> result = new ArrayList<Event>(events.size() + eventArc.size());
+        result.addAll(events);
+        List<Event> events2 = eventArc.stream()
+        	.map(e -> convertArchivedEventToEvent(e))
+        	.collect(Collectors.toList());
+        result.addAll(events2);
+		return result.stream()
+				.sorted((e1, e2) -> 
+				(e1.getEventId().getEventStart()).compareTo(e2.getEventId().getEventStart()))
+				.skip(size * (page - 1))
+				.limit(size)
+				.collect(Collectors.toList());
 	}
-
 
 }

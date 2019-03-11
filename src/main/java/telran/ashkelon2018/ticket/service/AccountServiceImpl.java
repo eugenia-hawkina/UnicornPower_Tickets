@@ -31,12 +31,12 @@ public class AccountServiceImpl implements AccountService {
 	@Override
 	public AccountProfileDto addManager(AccountRegDto managerRegDto, String token) {
 		AccountCredentials credentials = accountConfiguration.tokenDecode(token);
-		if (repository.existsById(credentials.getLogin())) {
+		if (repository.existsById(credentials.getLogin().toLowerCase())) {
 			throw new UserExistsException("User already exists");
 		}
 		String hashPassword = encoder.encode(credentials.getPassword());
 		UserAccount manager = UserAccount.builder()
-				.login(credentials.getLogin())
+				.login(credentials.getLogin().toLowerCase())
 				.password(hashPassword)
 				.name(managerRegDto.getName())
 				.phone(managerRegDto.getPhone())
@@ -50,7 +50,7 @@ public class AccountServiceImpl implements AccountService {
 
 	private AccountProfileDto convertToAccountProfileDto(UserAccount manager) {
 		return AccountProfileDto.builder()
-				.login(manager.getLogin())
+				.login(manager.getLogin().toLowerCase())
 				.name(manager.getName())
 				.phone(manager.getPhone())
 				.halls(manager.getHalls())
@@ -61,13 +61,13 @@ public class AccountServiceImpl implements AccountService {
 	@Override
 	public AccountProfileDto loginAccount(String token) {
 		AccountCredentials credentials = accountConfiguration.tokenDecode(token);
-		UserAccount userAccount = repository.findById(credentials.getLogin()).get();
+		UserAccount userAccount = repository.findById(credentials.getLogin().toLowerCase()).get();
 		return convertToUniversalAccountProfileDto(userAccount);
 	}
 
 	private AccountProfileDto convertToUniversalAccountProfileDto(UserAccount userAccount) {
 		return AccountProfileDto.builder()
-				.login(userAccount.getLogin())
+				.login(userAccount.getLogin().toLowerCase())
 				.name(userAccount.getName())
 				.phone(userAccount.getPhone())
 				.halls(userAccount.getHalls())
@@ -78,7 +78,7 @@ public class AccountServiceImpl implements AccountService {
 	@Override
 	public AccountProfileDto editManager(AccountRegDto managerRegDto, String token) {
 		AccountCredentials credentials = accountConfiguration.tokenDecode(token);
-		UserAccount userAccount = repository.findById(credentials.getLogin()).get();
+		UserAccount userAccount = repository.findById(credentials.getLogin().toLowerCase()).get();
 		userAccount.setName(managerRegDto.getName());
 		userAccount.setPhone(managerRegDto.getPhone());
 		repository.save(userAccount);
@@ -89,7 +89,7 @@ public class AccountServiceImpl implements AccountService {
 	@Override
 	public AccountProfileDto removeUser(String token) {
 		AccountCredentials credentials = accountConfiguration.tokenDecode(token);
-		UserAccount userAccount = repository.findById(credentials.getLogin()).get();
+		UserAccount userAccount = repository.findById(credentials.getLogin().toLowerCase()).get();
 		repository.delete(userAccount);
 		return convertToAccountProfileDto(userAccount);
 	}
@@ -112,12 +112,12 @@ public class AccountServiceImpl implements AccountService {
 	@Override
 	public AccountProfileDto addUser(AccountRegDto accountRegDto, String token) {
 		AccountCredentials credentials = accountConfiguration.tokenDecode(token);
-		if (repository.existsById(credentials.getLogin())) {
+		if (repository.existsById(credentials.getLogin().toLowerCase())) {
 			throw new UserExistsException("User already exists");
 		}
 		String hashPassword = encoder.encode(credentials.getPassword());
 		UserAccount user = UserAccount.builder()
-				.login(credentials.getLogin())
+				.login(credentials.getLogin().toLowerCase())
 				.password(hashPassword)
 				.name(accountRegDto.getName())
 				.phone(accountRegDto.getPhone())
