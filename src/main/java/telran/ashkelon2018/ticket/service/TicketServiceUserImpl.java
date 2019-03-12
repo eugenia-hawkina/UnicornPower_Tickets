@@ -442,7 +442,7 @@ public class TicketServiceUserImpl implements TicketServiceUser {
 		if(eventType != null) {
 			query.addCriteria(Criteria.where("eventType").is(eventType));
 		}
-		if(hallId != null) {
+		if(hallId != null) { 
 			query.addCriteria(Criteria.where("_id.hallId").is(hallId));
 		}
 		List <EventArchived> eventArc = mongoTemplate.find(query, EventArchived.class);		
