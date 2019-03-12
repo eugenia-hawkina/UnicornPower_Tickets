@@ -115,7 +115,6 @@ public class TicketServiceUserImpl implements TicketServiceUser {
 					.limit(size)
 					.collect(Collectors.toSet()));
 		}
-		// FIXME combine info from two repositories
 		if(dateFrom.isBefore(LocalDate.now()) && dateTo.isAfter(LocalDate.now())) {
 			throw new BadRequestException("Both dates should be either beforeNow or afterNow");
 		}	
@@ -398,7 +397,6 @@ public class TicketServiceUserImpl implements TicketServiceUser {
 					.limit(size)
 					.collect(Collectors.toSet()));
 		}
-		// FIXME combine info from two repositories
 		if(dateFrom.isBefore(LocalDate.now()) && dateTo.isAfter(LocalDate.now())) {
 			throw new BadRequestException("Both dates should be either beforeNow or afterNow");
 		}

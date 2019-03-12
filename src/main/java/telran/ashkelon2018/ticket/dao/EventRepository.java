@@ -17,7 +17,7 @@ public interface EventRepository extends MongoRepository<Event, EventId> {
 	
 	Set<Event> findByUserIdOrderByEventIdEventStart(String userId);
 	
-	Stream<Event> findByEventStatusOrderByEventIdEventStart(EventStatus eventStatus);
+	Stream<Event> findByEventStatus(EventStatus eventStatus);
 	
 	Stream<Event> findByEventIdHallIdAndEventIdEventStartBetweenOrderByEventIdEventStart(String hallId, LocalDate from, LocalDate to);
 	

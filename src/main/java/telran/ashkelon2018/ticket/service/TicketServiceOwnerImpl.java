@@ -176,8 +176,9 @@ public class TicketServiceOwnerImpl implements TicketServiceOwner {
 			throw new AccessDeniedException("Access denied, you are not an onwer");
 		}
 		Set<Event> hiddenEvents = new HashSet<>();
-		hiddenEvents.addAll(eventRepository.findByEventStatusOrderByEventIdEventStart(EventStatus.HIDDEN)
-				.collect(Collectors.toSet()));
+		hiddenEvents = eventRepository.findByEventStatus(EventStatus.HIDDEN)
+				.collect(Collectors.toCollection(() -> new 
+						TreeSet<Event>(eventStartComparator)));
 		return hiddenEvents;
 	}
 
@@ -188,13 +189,18 @@ public class TicketServiceOwnerImpl implements TicketServiceOwner {
 		if(!owner.getRoles().contains(UserRole.OWNER)) {
 			throw new AccessDeniedException("Access denied, you are not an onwer");
 		}
-		Set<Event> hiddenEvents = new HashSet<>();
-		hiddenEvents.addAll(eventRepository.findByEventStatusOrderByEventIdEventStart(EventStatus.HIDDEN)
+		Set<Event> rEvents = 
+		 eventRepository.findByEventStatus(EventStatus.HIDDEN)
 				.skip(size * (page - 1))
 				.limit(size)
-				.collect(Collectors.toSet()));
-		return hiddenEvents;
+				.collect(Collectors.toCollection(() -> new 
+						TreeSet<Event>(eventStartComparator)));
+		return rEvents;
 	}
+	
+	private static Comparator<Event> eventStartComparator = (e1, e2) -> {
+		return e1.getEventId().getEventStart().compareTo(e2.getEventId().getEventStart());
+	};
 	
 	@Override
 	public Set<Event> receiveActiveAndHiddenEventsByHall(int page, int size, String hallId, Principal principal){
@@ -207,11 +213,12 @@ public class TicketServiceOwnerImpl implements TicketServiceOwner {
 		if(hall == null) {
 			throw new NotFoundException("Hall not found");
 		}
-		Set<Event> events = new HashSet<>();
+		Set<Event> events = new TreeSet<>();
 		events.addAll(eventRepository.findByEventIdHallIdOrderByEventIdEventStart(hallId)
 				.skip(size * (page - 1))
 				.limit(size)
-				.collect(Collectors.toSet()));
+				.collect(Collectors.toCollection(() -> new 
+						TreeSet<Event>(eventStartComparator))));
 		return events;
 	}
 
@@ -267,7 +274,8 @@ public class TicketServiceOwnerImpl implements TicketServiceOwner {
 			.skip(size * (page - 1))
 			.limit(size)		
 			.map(user -> convertToAccountProfileForOwnerDto(user))
-			.collect(Collectors.toSet());
+			.collect(Collectors.toCollection(() -> new 
+					TreeSet<AccountProfileForOwnerDto>(loginComparator)));
 		return allManagers;
 	}
 	

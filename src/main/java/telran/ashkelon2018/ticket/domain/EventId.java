@@ -28,5 +28,10 @@ public class EventId implements Serializable{
 	@JsonFormat(pattern = "yyyy-MM-dd'T'HH-mm")
 	LocalDateTime eventStart; 	
 	String hallId;
+	
+//	@Override
+//	public int compareTo(EventId o) {		
+//		return eventStart.compareTo(o.getEventStart());
+//	}
 
 }
