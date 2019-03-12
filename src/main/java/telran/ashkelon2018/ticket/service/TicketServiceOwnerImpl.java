@@ -246,7 +246,7 @@ public class TicketServiceOwnerImpl implements TicketServiceOwner {
 	public Set<AccountProfileForOwnerDto> findAllUsers(int page, int size, Principal principal) {
 		Set<AccountProfileForOwnerDto> allUsers = new HashSet<>();
 		allUsers = userAccountRepository.findAllByOrderByLogin()
-			.skip(size * (page - 1))
+			.skip(size * (page - 1)) 
 			.limit(size)		
 			.map(user -> convertToAccountProfileForOwnerDto(user))			
 			.collect(Collectors.toSet());
