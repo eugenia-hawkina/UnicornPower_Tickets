@@ -22,5 +22,12 @@ public class AccountProfileForOwnerDto {
 	Set<UserRole> roles;
 	Set <EventId> visitedEvents;
 	Set<String> halls;
+	
+	
+	public int compareTo(AccountProfileForOwnerDto p2) {
+		
+		return login.compareTo(p2.getLogin());
+		
+	}
 
 }

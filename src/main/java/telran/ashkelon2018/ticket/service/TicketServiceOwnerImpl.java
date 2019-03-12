@@ -1,8 +1,10 @@
 package telran.ashkelon2018.ticket.service;
 
 import java.security.Principal;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -243,15 +245,20 @@ public class TicketServiceOwnerImpl implements TicketServiceOwner {
 	}
 
 	@Override
-	public Set<AccountProfileForOwnerDto> findAllUsers(int page, int size, Principal principal) {
-		Set<AccountProfileForOwnerDto> allUsers = new HashSet<>();
+	public Set<AccountProfileForOwnerDto> findAllUsers(int page, int size, Principal principal){
+		Set<AccountProfileForOwnerDto> allUsers = new TreeSet<>();
 		allUsers = userAccountRepository.findAllByOrderByLogin()
 			.skip(size * (page - 1)) 
 			.limit(size)	 	
-			.map(user -> convertToAccountProfileForOwnerDto(user))			
-			.collect(Collectors.toSet());
+			.map(user -> convertToAccountProfileForOwnerDto(user))
+			.collect(Collectors.toCollection(() -> new 
+					TreeSet<AccountProfileForOwnerDto>(loginComparator)));
 		return allUsers;
 	}
+	
+	private static Comparator<AccountProfileForOwnerDto> loginComparator = (p1, p2) -> {
+		return p1.getLogin().compareTo(p2.getLogin());		
+	};
 
 	@Override
 	public Set<AccountProfileForOwnerDto> findAllManagers(int page, int size, Principal principal){
