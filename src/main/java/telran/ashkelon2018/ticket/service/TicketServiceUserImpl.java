@@ -75,6 +75,8 @@ public class TicketServiceUserImpl implements TicketServiceUser {
 	public Set<EventArchived> receiveArchivedEvents(int page, int size) {
 		Set<EventArchived> archivedEvents = new HashSet<>();
 		archivedEvents.addAll(eventArchivedRepository.findAllBy()
+			.sorted((e1, e2) -> e2.getEventId().getEventStart()
+					.compareTo(e1.getEventId().getEventStart()))
 			.skip(size*(page-1))
 			.limit(size)
 			.collect(Collectors.toSet()));
@@ -107,7 +109,7 @@ public class TicketServiceUserImpl implements TicketServiceUser {
 		}
 		if (dateFrom.isAfter(LocalDate.now()) && dateTo.isAfter(LocalDate.now())) {			
 			eventsAll.addAll(eventRepository
-					.findByEventIdEventStartBetween(dateFrom, dateTo)	
+					.findByEventIdEventStartBetweenOrderByEventIdEventStart(dateFrom, dateTo)	
 					.filter(e -> e.getEventStatus().equals(EventStatus.ACTIVE))
 					.skip(size * (page - 1))
 					.limit(size)
@@ -143,7 +145,7 @@ public class TicketServiceUserImpl implements TicketServiceUser {
 		if(!hallRepository.existsById(hallId)) {
 			throw new NotFoundException("Hall not found");
 		}
-		events.addAll(eventRepository.findByEventIdHallId(hallId)
+		events.addAll(eventRepository.findByEventIdHallIdOrderByEventIdEventStart(hallId)
 				.filter(e -> e.getEventStatus().equals(EventStatus.ACTIVE))
 				.skip(size*(page-1))
 				.limit(size)
@@ -154,7 +156,7 @@ public class TicketServiceUserImpl implements TicketServiceUser {
 	@Override
 	public Set<Event> receiveEventsByArtist(String artist, int page, int size) {
 		Set<Event> events = new HashSet<>();
-		events.addAll(eventRepository.findByArtist(artist)
+		events.addAll(eventRepository.findByArtistOrderByEventIdEventStart(artist)
 				.filter(e -> e.getEventStatus().equals(EventStatus.ACTIVE))
 				.skip(size*(page-1))
 				.limit(size)
@@ -319,7 +321,10 @@ public class TicketServiceUserImpl implements TicketServiceUser {
 				events.add(eventRepository.findById(arr[i]).orElse(null));
 			}
 		}
-		return events;
+		return events.stream()
+				.sorted((e1, e2) -> e1.getEventId().getEventStart()
+						.compareTo(e2.getEventId().getEventStart()))
+				.collect(Collectors.toSet());
 	}
 
 	@Override
@@ -387,7 +392,7 @@ public class TicketServiceUserImpl implements TicketServiceUser {
 		}
 		if (dateFrom.isAfter(LocalDate.now()) && dateTo.isAfter(LocalDate.now())) {			
 			eventsAll.addAll(eventRepository
-					.findByEventIdHallIdAndEventIdEventStartBetween(hallId, dateFrom, dateTo)
+					.findByEventIdHallIdAndEventIdEventStartBetweenOrderByEventIdEventStart(hallId, dateFrom, dateTo)
 					.filter(e -> e.getEventStatus().equals(EventStatus.ACTIVE))
 					.skip(size * (page - 1))
 					.limit(size)
@@ -403,7 +408,7 @@ public class TicketServiceUserImpl implements TicketServiceUser {
 	public Set<Event> receiveEventsByEventType(EventType eventType, int page, int size){
 		Set<Event> events = new HashSet<>();
 		events.addAll(eventRepository				
-				.findByEventType(eventType)
+				.findByEventTypeOrderByEventIdEventStart(eventType)
 				.filter(e -> e.getEventStatus().equals(EventStatus.ACTIVE))
 				.skip(size * (page - 1))
 				.limit(size)

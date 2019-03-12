@@ -174,7 +174,7 @@ public class TicketServiceOwnerImpl implements TicketServiceOwner {
 			throw new AccessDeniedException("Access denied, you are not an onwer");
 		}
 		Set<Event> hiddenEvents = new HashSet<>();
-		hiddenEvents.addAll(eventRepository.findByEventStatus(EventStatus.HIDDEN)
+		hiddenEvents.addAll(eventRepository.findByEventStatusOrderByEventIdEventStart(EventStatus.HIDDEN)
 				.collect(Collectors.toSet()));
 		return hiddenEvents;
 	}
@@ -187,7 +187,7 @@ public class TicketServiceOwnerImpl implements TicketServiceOwner {
 			throw new AccessDeniedException("Access denied, you are not an onwer");
 		}
 		Set<Event> hiddenEvents = new HashSet<>();
-		hiddenEvents.addAll(eventRepository.findByEventStatus(EventStatus.HIDDEN)
+		hiddenEvents.addAll(eventRepository.findByEventStatusOrderByEventIdEventStart(EventStatus.HIDDEN)
 				.skip(size * (page - 1))
 				.limit(size)
 				.collect(Collectors.toSet()));
@@ -206,7 +206,7 @@ public class TicketServiceOwnerImpl implements TicketServiceOwner {
 			throw new NotFoundException("Hall not found");
 		}
 		Set<Event> events = new HashSet<>();
-		events.addAll(eventRepository.findByEventIdHallId(hallId)
+		events.addAll(eventRepository.findByEventIdHallIdOrderByEventIdEventStart(hallId)
 				.skip(size * (page - 1))
 				.limit(size)
 				.collect(Collectors.toSet()));
@@ -246,9 +246,11 @@ public class TicketServiceOwnerImpl implements TicketServiceOwner {
 	public Set<AccountProfileForOwnerDto> findAllUsers(int page, int size, Principal principal) {
 		Set<AccountProfileForOwnerDto> allUsers = new HashSet<>();
 		allUsers = userAccountRepository.findAllBy()
+			.sorted((u1, u2) -> u1.getLogin().compareToIgnoreCase(u2.getLogin()))
 			.skip(size * (page - 1))
 			.limit(size)		
-			.map(user -> convertToAccountProfileForOwnerDto(user))			.collect(Collectors.toSet());
+			.map(user -> convertToAccountProfileForOwnerDto(user))			
+			.collect(Collectors.toSet());
 		return allUsers;
 	}
 
@@ -256,6 +258,7 @@ public class TicketServiceOwnerImpl implements TicketServiceOwner {
 	public Set<AccountProfileForOwnerDto> findAllManagers(int page, int size, Principal principal){
 		Set<AccountProfileForOwnerDto> allManagers = new HashSet<>();
 		allManagers = userAccountRepository.findManagersByRolesIn(UserRole.MANAGER)
+			.sorted((m1, m2) -> m1.getLogin().compareToIgnoreCase(m2.getLogin()))
 			.skip(size * (page - 1))
 			.limit(size)		
 			.map(user -> convertToAccountProfileForOwnerDto(user))
@@ -272,7 +275,7 @@ public class TicketServiceOwnerImpl implements TicketServiceOwner {
 		if(!manager.getRoles().contains(UserRole.MANAGER)) {
 			throw new BadRequestException("User not a manager");
 		}
-		return eventRepository.findByUserId(login.toLowerCase());
+		return eventRepository.findByUserIdOrderByEventIdEventStart(login.toLowerCase());
 		}
 	
 	@Override

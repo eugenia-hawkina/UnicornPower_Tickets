@@ -15,20 +15,20 @@ public interface EventRepository extends MongoRepository<Event, EventId> {
 	
 	Stream<Event> findAllBy();
 	
-	Set<Event> findByUserId(String userId);
+	Set<Event> findByUserIdOrderByEventIdEventStart(String userId);
 	
-	Stream<Event> findByEventStatus(EventStatus eventStatus);
+	Stream<Event> findByEventStatusOrderByEventIdEventStart(EventStatus eventStatus);
 	
-	Stream<Event> findByEventIdHallIdAndEventIdEventStartBetween(String hallId, LocalDate from, LocalDate to);
+	Stream<Event> findByEventIdHallIdAndEventIdEventStartBetweenOrderByEventIdEventStart(String hallId, LocalDate from, LocalDate to);
 	
-	Stream<Event> findByEventIdEventStartBetween(LocalDate from, LocalDate to);
+	Stream<Event> findByEventIdEventStartBetweenOrderByEventIdEventStart(LocalDate from, LocalDate to);
 	
-	Stream<Event> findByEventIdHallId(String hallId);
+	Stream<Event> findByEventIdHallIdOrderByEventIdEventStart(String hallId);
 	
-	Stream<Event> findByArtist(String artist);
+	Stream<Event> findByArtistOrderByEventIdEventStart(String artist);
 	
-	Stream<Event> findByEventIdEventStartBefore(LocalDate to);
+	Stream<Event> findByEventIdEventStartBeforeOrderByEventIdEventStart(LocalDate to);
 
-	Stream<Event> findByEventType(EventType eventType);
+	Stream<Event> findByEventTypeOrderByEventIdEventStart(EventType eventType);
 	
 }

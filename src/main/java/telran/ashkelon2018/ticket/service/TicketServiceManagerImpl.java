@@ -128,7 +128,7 @@ public class TicketServiceManagerImpl implements TicketServiceManager {
 	@Override
 	public Set<Event> receiveMyUpcomingEvents(Principal principal) {
 		String id = principal.getName();
-		Set<Event> events = eventRepository.findByUserId(id);
+		Set<Event> events = eventRepository.findByUserIdOrderByEventIdEventStart(id);
 		return events;
 	}
 

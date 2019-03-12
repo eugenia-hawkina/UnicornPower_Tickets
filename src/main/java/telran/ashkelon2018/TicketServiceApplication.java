@@ -75,7 +75,7 @@ public class TicketServiceApplication implements CommandLineRunner {
 			while (true) {
 				try {
 					LocalDate date = LocalDate.now(); 
-					Event[] eventsArr = eventRepository.findByEventIdEventStartBefore(date)
+					Event[] eventsArr = eventRepository.findByEventIdEventStartBeforeOrderByEventIdEventStart(date)
 							.toArray(Event[]::new);
 					for(int i = 0; i < eventsArr.length; i++) {
 						if(eventsArr[i].getEventStatus().equals(EventStatus.HIDDEN)) {
