@@ -245,8 +245,7 @@ public class TicketServiceOwnerImpl implements TicketServiceOwner {
 	@Override
 	public Set<AccountProfileForOwnerDto> findAllUsers(int page, int size, Principal principal) {
 		Set<AccountProfileForOwnerDto> allUsers = new HashSet<>();
-		allUsers = userAccountRepository.findAllBy()
-			.sorted((u1, u2) -> u1.getLogin().compareToIgnoreCase(u2.getLogin()))
+		allUsers = userAccountRepository.findAllByOrderByLogin()
 			.skip(size * (page - 1))
 			.limit(size)		
 			.map(user -> convertToAccountProfileForOwnerDto(user))			
@@ -257,8 +256,7 @@ public class TicketServiceOwnerImpl implements TicketServiceOwner {
 	@Override
 	public Set<AccountProfileForOwnerDto> findAllManagers(int page, int size, Principal principal){
 		Set<AccountProfileForOwnerDto> allManagers = new HashSet<>();
-		allManagers = userAccountRepository.findManagersByRolesIn(UserRole.MANAGER)
-			.sorted((m1, m2) -> m1.getLogin().compareToIgnoreCase(m2.getLogin()))
+		allManagers = userAccountRepository.findManagersByRolesInOrderByLogin(UserRole.MANAGER)
 			.skip(size * (page - 1))
 			.limit(size)		
 			.map(user -> convertToAccountProfileForOwnerDto(user))

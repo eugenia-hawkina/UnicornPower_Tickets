@@ -9,8 +9,8 @@ import telran.ashkelon2018.ticket.enums.UserRole;
 
 public interface UserAccountRepository extends MongoRepository<UserAccount, String> {
 	
-	Stream<UserAccount> findAllBy();
+	Stream<UserAccount> findAllByOrderByLogin();
 	
-	Stream<UserAccount> findManagersByRolesIn(UserRole userRole);
+	Stream<UserAccount> findManagersByRolesInOrderByLogin(UserRole userRole);
 
 }
